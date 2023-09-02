@@ -13,6 +13,12 @@ func (self *Forms) Push(form Form) {
 	self.items = append(self.items, form)
 }
 
+func (self *Forms) Unpop(form Form) {
+	self.items = append(self.items, nil)
+	copy(self.items[:len(self.items)-1], self.items[1:])
+	self.items[0] = form
+}
+
 func (self Forms) Peek() Form {
 	i := len(self.items)
 

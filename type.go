@@ -35,7 +35,7 @@ func (self *BasicType) String() string {
 }
 
 func (_ BasicType) Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error {
-	vm.Ops[vm.Emit(true)] = NewPushOp(pos, v)
+	args.Unpop(NewLitForm(pos, v))
 	return nil
 }
 
