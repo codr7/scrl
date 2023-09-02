@@ -120,7 +120,7 @@ func (_ StrType) Dump(v Val, out io.Writer) error {
 type ValSet = Set[Val]
 
 func NewValSet(compare Compare[Val]) *ValSet {
-	return NewSet[Val](ValCompare)
+	return NewSet[Val](ValCompare, nil)
 }
 
 type SetType struct {

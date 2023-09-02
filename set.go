@@ -7,16 +7,17 @@ import (
 )
 
 type Set[T any] struct {
+	Deque[T]
 	compare Compare[T]
-	items   []T
 }
 
-func NewSet[T any](compare Compare[T]) *Set[T] {
-	return new(Set[T]).Init(compare)
+func NewSet[T any](compare Compare[T], items []T) *Set[T] {
+	return new(Set[T]).Init(compare, items)
 }
 
-func (self *Set[T]) Init(compare Compare[T]) *Set[T] {
+func (self *Set[T]) Init(compare Compare[T], items []T) *Set[T] {
 	self.compare = compare
+	self.Deque.Init(items)
 	return self
 }
 
@@ -40,26 +41,9 @@ func (self Set[T]) Index(v T) (int, *T) {
 	return min, nil
 }
 
-func (self Set[T]) Clone() *Set[T] {
-	dst := NewSet[T](self.compare)
-	dst.items = make([]T, len(self.items))
-	copy(dst.items, self.items)
-	return dst
-}
-
 func (self Set[T]) Find(v T) *T {
 	_, found := self.Index(v)
 	return found
-}
-
-func (self Set[T]) Each(f func(any) bool) bool {
-	for _, it := range self.items {
-		if !f(it) {
-			return false
-		}
-	}
-
-	return true
 }
 
 func (self *Set[T]) Add(v T) bool {
@@ -83,14 +67,6 @@ func (self *Set[T]) Remove(v T) *T {
 	}
 
 	return found
-}
-
-func (self Set[T]) Items() []T {
-	return self.items
-}
-
-func (self Set[T]) Len() int {
-	return len(self.items)
 }
 
 func (self Set[T]) Dump(out io.Writer) error {

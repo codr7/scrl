@@ -1,4 +1,3 @@
-* use deque as base type in Set
 * add deque type to abc lib
 * add deque reader []
 * add char literals

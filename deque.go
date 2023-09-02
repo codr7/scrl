@@ -63,3 +63,13 @@ func (self *Deque[T]) Cut(n int) []T {
 	self.items = self.items[:i]
 	return out
 }
+
+func (self Deque[T]) Each(f func(T) bool) bool {
+	for _, it := range self.items {
+		if !f(it) {
+			return false
+		}
+	}
+
+	return true
+}
