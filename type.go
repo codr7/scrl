@@ -1,8 +1,8 @@
 package scrl
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 )
 
 type Type interface {
@@ -13,8 +13,8 @@ type Type interface {
 	Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error
 	Eq(l, r Val) bool
 	IsTrue(v Val) bool
-	Dump(v Val, out *bufio.Writer) error
-	Write(v Val, out *bufio.Writer) error
+	Dump(v Val, out io.Writer) error
+	Write(v Val, out io.Writer) error
 }
 
 type BasicType struct {
@@ -34,7 +34,7 @@ func (self *BasicType) String() string {
 }
 
 func (_ BasicType) Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error {
-	vm.Ops[vm.Emit(1)] = NewPushOp(pos, v)
+	vm.Ops[vm.Emit(true)] = NewPushOp(pos, v)
 	return nil
 }
 
@@ -46,12 +46,12 @@ func (_ BasicType) IsTrue(_ Val) bool {
 	return true
 }
 
-func (_ BasicType) Dump(v Val, out *bufio.Writer) error {
+func (_ BasicType) Dump(v Val, out io.Writer) error {
 	_, err := fmt.Fprint(out, v.d)
 	return err
 }
 
-func (_ BasicType) Write(v Val, out *bufio.Writer) error {
+func (_ BasicType) Write(v Val, out io.Writer) error {
 	_, err := fmt.Fprint(out, v.d)
 	return err
 }

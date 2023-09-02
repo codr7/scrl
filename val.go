@@ -1,7 +1,7 @@
 package scrl
 
 import (
-	"bufio"
+	"io"
 	"strings"
 )
 
@@ -37,16 +37,16 @@ func (self Val) Emit(args *Forms, vm *VM, env Env, pos Pos) error {
 	return self.t.Emit(self, args, vm, env, pos)
 }
 
-func (self Val) Write(out *bufio.Writer) error {
+func (self Val) Write(out io.Writer) error {
 	return self.t.Write(self, out)
 }
 
-func (self Val) Dump(out *bufio.Writer) error {
+func (self Val) Dump(out io.Writer) error {
 	return self.t.Dump(self, out)
 }
 
 func (self Val) String() string {
 	var out strings.Builder
-	self.Dump(bufio.NewWriter(&out))
+	self.Dump(&out)
 	return out.String()
 }

@@ -1,2 +1,5 @@
-* import
-* add trace prim
+* fib
+** add bench op
+* faster eval?
+* add slice type
+** binary sorted slice

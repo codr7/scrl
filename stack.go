@@ -1,7 +1,7 @@
 package scrl
 
 import (
-	"bufio"
+	"io"
 )
 
 type Stack struct {
@@ -60,14 +60,14 @@ func (self Stack) Len() int {
 	return len(self.items)
 }
 
-func (self Stack) Dump(out *bufio.Writer) error {
-	if _, err := out.WriteRune('['); err != nil {
+func (self Stack) Dump(out io.Writer) error {
+	if _, err := io.WriteString(out, "["); err != nil {
 		return err
 	}
 
 	for i, v := range self.items {
 		if i > 0 {
-			if _, err := out.WriteRune(' '); err != nil {
+			if _, err := io.WriteString(out, " "); err != nil {
 				return err
 			}
 		}
@@ -77,7 +77,7 @@ func (self Stack) Dump(out *bufio.Writer) error {
 		}
 	}
 
-	if _, err := out.WriteRune(']'); err != nil {
+	if _, err := io.WriteString(out, "]"); err != nil {
 		return err
 	}
 

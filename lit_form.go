@@ -20,7 +20,7 @@ func (self *LitForm) Init(pos Pos, v Val) *LitForm {
 }
 
 func (self LitForm) Emit(args *Forms, vm *VM, env Env) error {
-	vm.Ops[vm.Emit(1)] = NewPushOp(self.pos, self.val)
+	vm.Ops[vm.Emit(true)] = NewPushOp(self.pos, self.val)
 	return nil
 }
 

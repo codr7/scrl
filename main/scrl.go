@@ -7,5 +7,6 @@ import (
 func main() {
 	var vm scrl.VM
 	vm.Init()
+	vm.Task().Env.Import(&scrl.AbcLib)
 	scrl.REPL(&vm)
 }
