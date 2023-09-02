@@ -1,7 +1,17 @@
 * scrl
 
+** pairs
+New pairs may be created using `:`.
+
+```
+ 1:2
+  
+[1:2]
+```
+
 ** sets
 Sets are ordered collections of values.
+New sets may be created using `{...}`.
 
 ```
  {3 2 1}
