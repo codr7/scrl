@@ -2,6 +2,7 @@ package scrl
 
 import (
 	"io"
+	"strings"
 )
 
 var AbcLib AbcLibT
@@ -34,6 +35,18 @@ type IntType struct {
 	BasicType
 }
 
+func (_ IntType) Compare(l, r Val) int {
+	if l.d.(int) < r.d.(int) {
+		return -1
+	}
+
+	if l.d.(int) > r.d.(int) {
+		return 1
+	}
+
+	return 0
+}
+
 func (_ IntType) IsTrue(v Val) bool {
 	return v.d != 0
 }
@@ -63,12 +76,25 @@ func (_ StrType) IsTrue(v Val) bool {
 	return len(v.d.(string)) > 0
 }
 
+func (_ StrType) Compare(l, r Val) int {
+	return strings.Compare(l.d.(string), r.d.(string))
+}
+
+type SliceType struct {
+	BasicType
+}
+
+func (_ SliceType) IsTrue(v Val) bool {
+	return v.d.(*ValSlice).Len() > 0
+}
+
 type AbcLibT struct {
 	BasicLib
-	BoolType BoolType
-	IntType  IntType
-	PrimType PrimType
-	StrType  StrType
+	BoolType  BoolType
+	IntType   IntType
+	PrimType  PrimType
+	SliceType SliceType
+	StrType   StrType
 }
 
 func (self *AbcLibT) Init(name string) *AbcLibT {
@@ -76,6 +102,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BoolType.Init("Bool")
 	self.IntType.Init("Int")
 	self.PrimType.Init("Prim")
+	self.SliceType.Init("Slice")
 	self.StrType.Init("Str")
 
 	self.Bind("T", NewVal(&self.BoolType, true))

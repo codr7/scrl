@@ -1,8 +1,8 @@
 package scrl
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 )
 
 type IdForm struct {
@@ -34,8 +34,8 @@ func (self *IdForm) Emit(args *Forms, vm *VM, env Env) error {
 	return nil
 }
 
-func (self IdForm) Dump(out *bufio.Writer) error {
-	_, err := out.WriteString(self.name)
+func (self IdForm) Dump(out io.Writer) error {
+	_, err := io.WriteString(out, self.name)
 	return err
 }
 

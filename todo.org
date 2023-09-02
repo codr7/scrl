@@ -1,5 +1,6 @@
 * fib
 ** add bench op
 * faster eval?
-* add slice type
-** binary sorted slice
+* add pair type
+** add pair reader with :
+** handle pairs in slice op

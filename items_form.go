@@ -1,7 +1,7 @@
 package scrl
 
 import (
-	"bufio"
+	"io"
 )
 
 type ItemsForm struct {
@@ -21,10 +21,10 @@ func (self ItemsForm) Emit(args *Forms, vm *VM, env Env) error {
 	return fargs.Emit(vm, env)
 }
 
-func (self ItemsForm) Dump(out *bufio.Writer) error {
+func (self ItemsForm) Dump(out io.Writer) error {
 	for i, f := range self.items {
 		if i > 0 {
-			if _, err := out.WriteRune(' '); err != nil {
+			if _, err := io.WriteString(out, " "); err != nil {
 				return err
 			}
 		}

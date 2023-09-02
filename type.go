@@ -10,6 +10,7 @@ type Type interface {
 	Name() string
 	String() string
 
+	Compare(l, r Val) int
 	Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error
 	Eq(l, r Val) bool
 	IsTrue(v Val) bool
@@ -36,6 +37,10 @@ func (self *BasicType) String() string {
 func (_ BasicType) Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error {
 	vm.Ops[vm.Emit(true)] = NewPushOp(pos, v)
 	return nil
+}
+
+func (_ BasicType) Compare(l, r Val) int {
+	return 0
 }
 
 func (_ BasicType) Eq(l, r Val) bool {

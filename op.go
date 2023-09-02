@@ -54,6 +54,34 @@ func (self *PushOp) Dump(out io.Writer) error {
 	return nil
 }
 
+type SliceOp struct {
+	pos       Pos
+	itemCount int
+}
+
+func NewSliceOp(pos Pos, itemCount int) *SliceOp {
+	return &SliceOp{pos: pos, itemCount: itemCount}
+}
+
+func (self *SliceOp) Eval(vm *VM, pc PC) (PC, error) {
+	s := NewValSlice(ValCompare)
+
+	for i, v := range vm.task.Stack.Cut(self.itemCount) {
+		s.Add(NewVal(&AbcLib.IntType, i), v)
+	}
+
+	vm.task.Stack.Push(NewVal(&AbcLib.SliceType, s))
+	return vm.Eval(pc + 1)
+}
+
+func (self *SliceOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "Slice %v", self.itemCount); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 var StopOp StopOpT
 
 type StopOpT struct{}

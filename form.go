@@ -1,13 +1,13 @@
 package scrl
 
 import (
-	"bufio"
+	"io"
 )
 
 type Form interface {
 	Pos() Pos
 	Emit(args *Forms, vm *VM, env Env) error
-	Dump(out *bufio.Writer) error
+	Dump(out io.Writer) error
 }
 
 type BasicForm struct {

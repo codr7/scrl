@@ -21,8 +21,8 @@ func (self *Val) Init(t Type, d any) {
 	self.d = d
 }
 
-func (self Val) IsTrue() bool {
-	return self.t.IsTrue(self)
+func (self Val) Compare(other Val) int {
+	return self.t.Compare(self, other)
 }
 
 func (self Val) Eq(other Val) bool {
@@ -31,6 +31,10 @@ func (self Val) Eq(other Val) bool {
 	}
 
 	return self.t.Eq(self, other)
+}
+
+func (self Val) IsTrue() bool {
+	return self.t.IsTrue(self)
 }
 
 func (self Val) Emit(args *Forms, vm *VM, env Env, pos Pos) error {
@@ -49,4 +53,14 @@ func (self Val) String() string {
 	var out strings.Builder
 	self.Dump(&out)
 	return out.String()
+}
+
+func ValCompare(l, r Val) int {
+	return l.Compare(r)
+}
+
+type ValSlice = Slice[Val, Val]
+
+func NewValSlice(compare Compare[Val]) *ValSlice {
+	return NewSlice[Val, Val](ValCompare)
 }

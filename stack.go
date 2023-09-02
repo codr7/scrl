@@ -2,6 +2,7 @@ package scrl
 
 import (
 	"io"
+	"strings"
 )
 
 type Stack struct {
@@ -82,4 +83,10 @@ func (self Stack) Dump(out io.Writer) error {
 	}
 
 	return nil
+}
+
+func (self Stack) String() string {
+	var out strings.Builder
+	self.Dump(&out)
+	return out.String()
 }

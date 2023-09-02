@@ -57,6 +57,8 @@ func ReadForm(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	switch c {
 	case '(':
 		return ReadList(vm, in, out, pos)
+	case '{':
+		return ReadSlice(vm, in, out, pos)
 	case '"':
 		return ReadStr(vm, in, out, pos)
 	default:
@@ -70,42 +72,6 @@ func ReadForm(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	}
 
 	return fmt.Errorf("Invalid syntax: %v", c)
-}
-
-func ReadList(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
-	fpos := *pos
-	pos.column++
-	var body Forms
-
-	for {
-		c, _, err := in.ReadRune()
-
-		if err != nil {
-			if err == io.EOF {
-				return fmt.Errorf("Open group")
-			}
-
-			return err
-		}
-
-		if c == ')' {
-			pos.column++
-			break
-		} else {
-			in.UnreadRune()
-		}
-
-		if err := ReadForm(vm, in, &body, pos); err != nil {
-			if err == io.EOF {
-				return fmt.Errorf("Open group")
-			}
-
-			return err
-		}
-	}
-
-	out.Push(NewListForm(fpos, body.items...))
-	return nil
 }
 
 func ReadId(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
@@ -175,6 +141,78 @@ func ReadInt(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	}
 
 	out.Push(NewLitForm(fpos, NewVal(&AbcLib.IntType, v)))
+	return nil
+}
+
+func ReadList(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+	fpos := *pos
+	pos.column++
+	var body Forms
+
+	for {
+		c, _, err := in.ReadRune()
+
+		if err != nil {
+			if err == io.EOF {
+				return fmt.Errorf("Open list")
+			}
+
+			return err
+		}
+
+		if c == ')' {
+			pos.column++
+			break
+		} else {
+			in.UnreadRune()
+		}
+
+		if err := ReadForm(vm, in, &body, pos); err != nil {
+			if err == io.EOF {
+				return fmt.Errorf("Open list")
+			}
+
+			return err
+		}
+	}
+
+	out.Push(NewListForm(fpos, body.items...))
+	return nil
+}
+
+func ReadSlice(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+	fpos := *pos
+	pos.column++
+	var body Forms
+
+	for {
+		c, _, err := in.ReadRune()
+
+		if err != nil {
+			if err == io.EOF {
+				return fmt.Errorf("Open slice")
+			}
+
+			return err
+		}
+
+		if c == '}' {
+			pos.column++
+			break
+		} else {
+			in.UnreadRune()
+		}
+
+		if err := ReadForm(vm, in, &body, pos); err != nil {
+			if err == io.EOF {
+				return fmt.Errorf("Open slice")
+			}
+
+			return err
+		}
+	}
+
+	out.Push(NewSliceForm(fpos, body.items...))
 	return nil
 }
 

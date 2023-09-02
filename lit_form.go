@@ -1,7 +1,7 @@
 package scrl
 
 import (
-	"bufio"
+	"io"
 )
 
 type LitForm struct {
@@ -24,6 +24,6 @@ func (self LitForm) Emit(args *Forms, vm *VM, env Env) error {
 	return nil
 }
 
-func (self LitForm) Dump(out *bufio.Writer) error {
+func (self LitForm) Dump(out io.Writer) error {
 	return self.val.Dump(out)
 }

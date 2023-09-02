@@ -1,7 +1,7 @@
 package scrl
 
 import (
-	"bufio"
+	"io"
 )
 
 type ListForm struct {
@@ -17,8 +17,8 @@ func (self *ListForm) Init(pos Pos, items ...Form) *ListForm {
 	return self
 }
 
-func (self ListForm) Dump(out *bufio.Writer) error {
-	if _, err := out.WriteRune('('); err != nil {
+func (self ListForm) Dump(out io.Writer) error {
+	if _, err := io.WriteString(out, "("); err != nil {
 		return err
 	}
 
@@ -26,7 +26,7 @@ func (self ListForm) Dump(out *bufio.Writer) error {
 		return err
 	}
 
-	if _, err := out.WriteRune(')'); err != nil {
+	if _, err := io.WriteString(out, ")"); err != nil {
 		return err
 	}
 
