@@ -1,7 +1,7 @@
-* extract generic Deque type from Stack/Forms
-** add reader []
-** add Deque type to abc lib
-** use in Forms
+* add deque type to abc lib
+* add deque reader []
+* use deque as base type in Set
+* use deque as base type in Stack
 * add char literals
 ** add reader @A
 * --

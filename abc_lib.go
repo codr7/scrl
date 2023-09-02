@@ -117,6 +117,12 @@ func (_ StrType) Dump(v Val, out io.Writer) error {
 	return err
 }
 
+type ValSet = Set[Val]
+
+func NewValSet(compare Compare[Val]) *ValSet {
+	return NewSet[Val](ValCompare)
+}
+
 type SetType struct {
 	BasicType
 }
