@@ -1,6 +1,7 @@
 package scrl
 
 import (
+	"fmt"
 	"io"
 	"strings"
 )
@@ -105,6 +106,11 @@ func (_ StrType) IsTrue(v Val) bool {
 
 func (_ StrType) Compare(l, r Val) int {
 	return strings.Compare(l.d.(string), r.d.(string))
+}
+
+func (_ StrType) Dump(v Val, out io.Writer) error {
+	_, err := fmt.Fprintf(out, "\"%v\"", v.d.(string))
+	return err
 }
 
 type SetType struct {

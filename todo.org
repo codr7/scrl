@@ -3,6 +3,8 @@
 * extract generic Slice type from Stack
 ** add reader []
 ** add type to abc lib
+* add char literals
+** add reader @A
 * --
 * fib
 ** add bench op

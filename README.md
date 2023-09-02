@@ -1,5 +1,14 @@
 # scrl
 
+## strings
+New strings may be created using `"..."`.
+
+```
+"foo"
+  
+["foo"]
+```
+
 ## pairs
 New pairs may be created using `:`.
 
