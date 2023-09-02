@@ -1,6 +1,13 @@
-* fib
-** add bench op
-* faster eval?
+* rename Slice to Set
+** reader
 * add pair type
 ** add pair reader with :
 ** handle pairs in slice op
+* --
+* extract generic Slice type from Stack
+** add reader []
+** add type to abc lib
+* --
+* fib
+** add bench op
+* faster eval?

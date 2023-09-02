@@ -6,26 +6,26 @@ import (
 	"strings"
 )
 
-type SliceItem[K, V any] struct {
+type SetItem[K, V any] struct {
 	key   K
 	value V
 }
 
-type Slice[K, V any] struct {
+type Set[K, V any] struct {
 	compare Compare[K]
-	items   []SliceItem[K, V]
+	items   []SetItem[K, V]
 }
 
-func NewSlice[K, V any](compare Compare[K]) *Slice[K, V] {
-	return new(Slice[K, V]).Init(compare)
+func NewSet[K, V any](compare Compare[K]) *Set[K, V] {
+	return new(Set[K, V]).Init(compare)
 }
 
-func (self *Slice[K, V]) Init(compare Compare[K]) *Slice[K, V] {
+func (self *Set[K, V]) Init(compare Compare[K]) *Set[K, V] {
 	self.compare = compare
 	return self
 }
 
-func (self Slice[K, V]) Index(key K) (int, *V) {
+func (self Set[K, V]) Index(key K) (int, *V) {
 	min, max := 0, len(self.items)
 
 	for min < max {
@@ -45,19 +45,19 @@ func (self Slice[K, V]) Index(key K) (int, *V) {
 	return min, nil
 }
 
-func (self Slice[K, V]) Clone() *Slice[K, V] {
-	dst := NewSlice[K, V](self.compare)
-	dst.items = make([]SliceItem[K, V], len(self.items))
+func (self Set[K, V]) Clone() *Set[K, V] {
+	dst := NewSet[K, V](self.compare)
+	dst.items = make([]SetItem[K, V], len(self.items))
 	copy(dst.items, self.items)
 	return dst
 }
 
-func (self Slice[K, V]) Find(key K) *V {
+func (self Set[K, V]) Find(key K) *V {
 	_, found := self.Index(key)
 	return found
 }
 
-func (self Slice[K, V]) Each(f func(key, val interface{}) bool) bool {
+func (self Set[K, V]) Each(f func(key, val interface{}) bool) bool {
 	for _, it := range self.items {
 		if !f(it.key, it.value) {
 			return false
@@ -67,20 +67,20 @@ func (self Slice[K, V]) Each(f func(key, val interface{}) bool) bool {
 	return true
 }
 
-func (self *Slice[K, V]) Add(key K, val V) bool {
+func (self *Set[K, V]) Add(key K, val V) bool {
 	i, found := self.Index(key)
 
 	if found != nil {
 		return false
 	}
 
-	self.items = append(self.items, SliceItem[K, V]{})
+	self.items = append(self.items, SetItem[K, V]{})
 	copy(self.items[i+1:], self.items[i:])
-	self.items[i] = SliceItem[K, V]{key, val}
+	self.items[i] = SetItem[K, V]{key, val}
 	return true
 }
 
-func (self *Slice[K, V]) Remove(key K) *V {
+func (self *Set[K, V]) Remove(key K) *V {
 	i, found := self.Index(key)
 
 	if found != nil {
@@ -90,7 +90,7 @@ func (self *Slice[K, V]) Remove(key K) *V {
 	return found
 }
 
-func (self Slice[K, V]) Keys() []K {
+func (self Set[K, V]) Keys() []K {
 	out := make([]K, len(self.items))
 
 	for i, it := range self.items {
@@ -100,7 +100,7 @@ func (self Slice[K, V]) Keys() []K {
 	return out
 }
 
-func (self Slice[K, V]) Values() []V {
+func (self Set[K, V]) Values() []V {
 	out := make([]V, len(self.items))
 
 	for i, it := range self.items {
@@ -110,11 +110,11 @@ func (self Slice[K, V]) Values() []V {
 	return out
 }
 
-func (self Slice[K, V]) Len() int {
+func (self Set[K, V]) Len() int {
 	return len(self.items)
 }
 
-func (self Slice[K, V]) Dump(out io.Writer) error {
+func (self Set[K, V]) Dump(out io.Writer) error {
 	if _, err := io.WriteString(out, "{"); err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (self Slice[K, V]) Dump(out io.Writer) error {
 			}
 		}
 
-		if _, err := fmt.Fprintf(out, "%v %v", it.key, it.value); err != nil {
+		if _, err := fmt.Fprint(out, "%v %v", it.key, it.value); err != nil {
 			return err
 		}
 	}
@@ -138,7 +138,7 @@ func (self Slice[K, V]) Dump(out io.Writer) error {
 	return nil
 }
 
-func (self Slice[K, V]) String() string {
+func (self Set[K, V]) String() string {
 	var out strings.Builder
 	self.Dump(&out)
 	return out.String()

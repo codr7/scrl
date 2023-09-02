@@ -80,21 +80,21 @@ func (_ StrType) Compare(l, r Val) int {
 	return strings.Compare(l.d.(string), r.d.(string))
 }
 
-type SliceType struct {
+type SetType struct {
 	BasicType
 }
 
-func (_ SliceType) IsTrue(v Val) bool {
-	return v.d.(*ValSlice).Len() > 0
+func (_ SetType) IsTrue(v Val) bool {
+	return v.d.(*ValSet).Len() > 0
 }
 
 type AbcLibT struct {
 	BasicLib
-	BoolType  BoolType
-	IntType   IntType
-	PrimType  PrimType
-	SliceType SliceType
-	StrType   StrType
+	BoolType BoolType
+	IntType  IntType
+	PrimType PrimType
+	SetType  SetType
+	StrType  StrType
 }
 
 func (self *AbcLibT) Init(name string) *AbcLibT {
@@ -102,7 +102,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BoolType.Init("Bool")
 	self.IntType.Init("Int")
 	self.PrimType.Init("Prim")
-	self.SliceType.Init("Slice")
+	self.SetType.Init("Set")
 	self.StrType.Init("Str")
 
 	self.Bind("T", NewVal(&self.BoolType, true))

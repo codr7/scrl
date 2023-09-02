@@ -54,28 +54,28 @@ func (self *PushOp) Dump(out io.Writer) error {
 	return nil
 }
 
-type SliceOp struct {
+type SetOp struct {
 	pos       Pos
 	itemCount int
 }
 
-func NewSliceOp(pos Pos, itemCount int) *SliceOp {
-	return &SliceOp{pos: pos, itemCount: itemCount}
+func NewSetOp(pos Pos, itemCount int) *SetOp {
+	return &SetOp{pos: pos, itemCount: itemCount}
 }
 
-func (self *SliceOp) Eval(vm *VM, pc PC) (PC, error) {
-	s := NewValSlice(ValCompare)
+func (self *SetOp) Eval(vm *VM, pc PC) (PC, error) {
+	s := NewValSet(ValCompare)
 
 	for i, v := range vm.task.Stack.Cut(self.itemCount) {
 		s.Add(NewVal(&AbcLib.IntType, i), v)
 	}
 
-	vm.task.Stack.Push(NewVal(&AbcLib.SliceType, s))
+	vm.task.Stack.Push(NewVal(&AbcLib.SetType, s))
 	return vm.Eval(pc + 1)
 }
 
-func (self *SliceOp) Dump(out io.Writer) error {
-	if _, err := fmt.Fprintf(out, "Slice %v", self.itemCount); err != nil {
+func (self *SetOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "Set %v", self.itemCount); err != nil {
 		return err
 	}
 

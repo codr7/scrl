@@ -58,7 +58,7 @@ func ReadForm(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	case '(':
 		return ReadList(vm, in, out, pos)
 	case '{':
-		return ReadSlice(vm, in, out, pos)
+		return ReadSet(vm, in, out, pos)
 	case '"':
 		return ReadStr(vm, in, out, pos)
 	default:
@@ -180,7 +180,7 @@ func ReadList(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
-func ReadSlice(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadSet(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	pos.column++
 	var body Forms
@@ -190,7 +190,7 @@ func ReadSlice(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 
 		if err != nil {
 			if err == io.EOF {
-				return fmt.Errorf("Open slice")
+				return fmt.Errorf("Open set")
 			}
 
 			return err
@@ -205,14 +205,14 @@ func ReadSlice(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 
 		if err := ReadForm(vm, in, &body, pos); err != nil {
 			if err == io.EOF {
-				return fmt.Errorf("Open slice")
+				return fmt.Errorf("Open set")
 			}
 
 			return err
 		}
 	}
 
-	out.Push(NewSliceForm(fpos, body.items...))
+	out.Push(NewSetForm(fpos, body.items...))
 	return nil
 }
 

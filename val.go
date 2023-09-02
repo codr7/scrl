@@ -59,8 +59,8 @@ func ValCompare(l, r Val) int {
 	return l.Compare(r)
 }
 
-type ValSlice = Slice[Val, Val]
+type ValSet = Set[Val, Val]
 
-func NewValSlice(compare Compare[Val]) *ValSlice {
-	return NewSlice[Val, Val](ValCompare)
+func NewValSet(compare Compare[Val]) *ValSet {
+	return NewSet[Val, Val](ValCompare)
 }
