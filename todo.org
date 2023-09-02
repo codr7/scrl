@@ -1,7 +1,5 @@
-* add pair type
-** add pair reader with :
-** handle pairs in slice op
-* --
+* handle pairs in sets
+** only compare keys
 * extract generic Slice type from Stack
 ** add reader []
 ** add type to abc lib

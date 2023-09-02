@@ -51,6 +51,33 @@ func (_ IntType) IsTrue(v Val) bool {
 	return v.d != 0
 }
 
+type PairType struct {
+	BasicType
+}
+
+func (_ PairType) IsTrue(v Val) bool {
+	p := v.d.(Pair)
+	return p.left.IsTrue() && p.right.IsTrue()
+}
+
+func (_ PairType) Dump(v Val, out io.Writer) error {
+	p := v.d.(Pair)
+
+	if err := p.left.Dump(out); err != nil {
+		return err
+	}
+
+	if _, err := io.WriteString(out, ":"); err != nil {
+		return err
+	}
+
+	if err := p.right.Dump(out); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type PrimType struct {
 	BasicType
 }
@@ -92,6 +119,7 @@ type AbcLibT struct {
 	BasicLib
 	BoolType BoolType
 	IntType  IntType
+	PairType PairType
 	PrimType PrimType
 	SetType  SetType
 	StrType  StrType
@@ -101,6 +129,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BasicLib.Init(name)
 	self.BoolType.Init("Bool")
 	self.IntType.Init("Int")
+	self.PairType.Init("Pair")
 	self.PrimType.Init("Prim")
 	self.SetType.Init("Set")
 	self.StrType.Init("Str")

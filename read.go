@@ -61,6 +61,8 @@ func ReadForm(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 		return ReadSet(vm, in, out, pos)
 	case '"':
 		return ReadStr(vm, in, out, pos)
+	case ':':
+		return ReadPair(vm, in, out, pos)
 	default:
 		if unicode.IsDigit(c) {
 			in.UnreadRune()
@@ -177,6 +179,24 @@ func ReadList(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	}
 
 	out.Push(NewListForm(fpos, body.items...))
+	return nil
+}
+
+func ReadPair(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+	fpos := *pos
+	pos.column++
+	left := out.Pop()
+
+	if err := ReadForm(vm, in, out, pos); err != nil {
+		if err == io.EOF {
+			return fmt.Errorf("Invalid pair")
+		}
+
+		return err
+	}
+
+	right := out.Pop()
+	out.Push(NewPairForm(fpos, left.(*LitForm).val, right.(*LitForm).val))
 	return nil
 }
 

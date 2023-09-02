@@ -11,6 +11,29 @@ type Op interface {
 	Dump(out io.Writer) error
 }
 
+type PairOp struct {
+	pos Pos
+}
+
+func NewPairOp(pos Pos) *PairOp {
+	return &PairOp{pos: pos}
+}
+
+func (self *PairOp) Eval(vm *VM, pc PC) (PC, error) {
+	r := vm.task.Stack.Pop()
+	l := vm.task.Stack.Pop()
+	vm.task.Stack.Push(NewVal(&AbcLib.PairType, NewPair(*l, *r)))
+	return vm.Eval(pc + 1)
+}
+
+func (self *PairOp) Dump(out io.Writer) error {
+	if _, err := io.WriteString(out, "Pair"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type PrimCallOp struct {
 	pos    Pos
 	target *Prim
