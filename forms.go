@@ -9,17 +9,17 @@ func (self *Forms) Init(items []Form) *Forms {
 	return self
 }
 
-func (self *Forms) Push(form Form) {
-	self.items = append(self.items, form)
-}
-
-func (self *Forms) Unpop(form Form) {
+func (self *Forms) PushFront(form Form) {
 	self.items = append(self.items, nil)
 	copy(self.items[:len(self.items)-1], self.items[1:])
 	self.items[0] = form
 }
 
-func (self Forms) Peek() Form {
+func (self *Forms) PushBack(form Form) {
+	self.items = append(self.items, form)
+}
+
+func (self Forms) PeekFront() Form {
 	i := len(self.items)
 
 	if i == 0 {
@@ -29,7 +29,7 @@ func (self Forms) Peek() Form {
 	return self.items[0]
 }
 
-func (self *Forms) Pop() Form {
+func (self *Forms) PopFront() Form {
 	i := len(self.items)
 
 	if i == 0 {
@@ -38,6 +38,13 @@ func (self *Forms) Pop() Form {
 
 	f := self.items[0]
 	self.items = self.items[1:]
+	return f
+}
+
+func (self *Forms) PopBack() Form {
+	i := len(self.items) - 1
+	f := self.items[i]
+	self.items = self.items[:i]
 	return f
 }
 
@@ -51,7 +58,7 @@ func (self Forms) Len() int {
 
 func (self *Forms) Emit(vm *VM, env Env) error {
 	for len(self.items) > 0 {
-		if err := self.Pop().Emit(self, vm, env); err != nil {
+		if err := self.PopFront().Emit(self, vm, env); err != nil {
 			return err
 		}
 	}

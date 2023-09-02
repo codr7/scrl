@@ -101,7 +101,7 @@ func ReadId(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 		pos.column++
 	}
 
-	out.Push(NewIdForm(fpos, buf.String()))
+	out.PushBack(NewIdForm(fpos, buf.String()))
 	return nil
 }
 
@@ -142,7 +142,7 @@ func ReadInt(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 		pos.column++
 	}
 
-	out.Push(NewLitForm(fpos, NewVal(&AbcLib.IntType, v)))
+	out.PushBack(NewLitForm(fpos, NewVal(&AbcLib.IntType, v)))
 	return nil
 }
 
@@ -178,14 +178,14 @@ func ReadList(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 		}
 	}
 
-	out.Push(NewListForm(fpos, body.items...))
+	out.PushBack(NewListForm(fpos, body.items...))
 	return nil
 }
 
 func ReadPair(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	pos.column++
-	left := out.Pop()
+	left := out.PopBack()
 
 	if err := ReadForm(vm, in, out, pos); err != nil {
 		if err == io.EOF {
@@ -195,8 +195,8 @@ func ReadPair(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 		return err
 	}
 
-	right := out.Pop()
-	out.Push(NewPairForm(fpos, left.(*LitForm).val, right.(*LitForm).val))
+	right := out.PopBack()
+	out.PushBack(NewPairForm(fpos, left, right))
 	return nil
 }
 
@@ -232,7 +232,7 @@ func ReadSet(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 		}
 	}
 
-	out.Push(NewSetForm(fpos, body.items...))
+	out.PushBack(NewSetForm(fpos, body.items...))
 	return nil
 }
 
@@ -261,6 +261,6 @@ func ReadStr(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 		pos.column++
 	}
 
-	out.Push(NewLitForm(fpos, NewVal(&AbcLib.StrType, buf.String())))
+	out.PushBack(NewLitForm(fpos, NewVal(&AbcLib.StrType, buf.String())))
 	return nil
 }

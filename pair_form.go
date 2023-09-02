@@ -6,14 +6,14 @@ import (
 
 type PairForm struct {
 	BasicForm
-	left, right Val
+	left, right Form
 }
 
-func NewPairForm(pos Pos, left Val, right Val) *PairForm {
+func NewPairForm(pos Pos, left, right Form) *PairForm {
 	return new(PairForm).Init(pos, left, right)
 }
 
-func (self *PairForm) Init(pos Pos, left, right Val) *PairForm {
+func (self *PairForm) Init(pos Pos, left, right Form) *PairForm {
 	self.BasicForm.Init(pos)
 	self.left = left
 	self.right = right
@@ -21,11 +21,11 @@ func (self *PairForm) Init(pos Pos, left, right Val) *PairForm {
 }
 
 func (self PairForm) Emit(args *Forms, vm *VM, env Env) error {
-	if err := self.left.Emit(args, vm, env, self.pos); err != nil {
+	if err := self.left.Emit(args, vm, env); err != nil {
 		return err
 	}
 
-	if err := self.right.Emit(args, vm, env, self.pos); err != nil {
+	if err := self.right.Emit(args, vm, env); err != nil {
 		return err
 	}
 

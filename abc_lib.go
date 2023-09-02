@@ -61,6 +61,10 @@ func (_ PairType) IsTrue(v Val) bool {
 	return p.left.IsTrue() && p.right.IsTrue()
 }
 
+func (_ PairType) Compare(l, r Val) int {
+	return l.d.(Pair).left.Compare(r.d.(Pair).left)
+}
+
 func (_ PairType) Dump(v Val, out io.Writer) error {
 	p := v.d.(Pair)
 
@@ -87,7 +91,7 @@ func (_ PrimType) Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error {
 	p := v.d.(*Prim)
 
 	for i := 0; i < p.arity; i++ {
-		if err := args.Pop().Emit(args, vm, env); err != nil {
+		if err := args.PopFront().Emit(args, vm, env); err != nil {
 			return err
 		}
 	}
