@@ -156,7 +156,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.Bind("trace", NewVal(&self.PrimType, NewPrim("trace", 0,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
 			vm.Trace = !vm.Trace
-			vm.task.Stack.Push(NewVal(&self.BoolType, vm.Trace))
+			vm.task.Stack.PushBack(NewVal(&self.BoolType, vm.Trace))
 			return pc, nil
 		})))
 

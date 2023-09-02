@@ -51,3 +51,15 @@ func (self Deque[T]) Items() []T {
 func (self Deque[T]) Len() int {
 	return len(self.items)
 }
+
+func (self *Deque[T]) Clear() {
+	self.items = nil
+}
+
+func (self *Deque[T]) Cut(n int) []T {
+	out := make([]T, n)
+	i := len(self.items) - n
+	copy(out, self.items[i:])
+	self.items = self.items[:i]
+	return out
+}

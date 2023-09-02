@@ -20,9 +20,9 @@ func NewPairOp(pos Pos) *PairOp {
 }
 
 func (self *PairOp) Eval(vm *VM, pc PC) (PC, error) {
-	r := vm.task.Stack.Pop()
-	l := vm.task.Stack.Pop()
-	vm.task.Stack.Push(NewVal(&AbcLib.PairType, NewPair(*l, *r)))
+	r := vm.task.Stack.PopBack()
+	l := vm.task.Stack.PopBack()
+	vm.task.Stack.PushBack(NewVal(&AbcLib.PairType, NewPair(l, r)))
 	return vm.Eval(pc + 1)
 }
 
@@ -65,7 +65,7 @@ func NewPushOp(pos Pos, val Val) *PushOp {
 }
 
 func (self *PushOp) Eval(vm *VM, pc PC) (PC, error) {
-	vm.task.Stack.Push(self.val)
+	vm.task.Stack.PushBack(self.val)
 	return vm.Eval(pc + 1)
 }
 
@@ -93,7 +93,7 @@ func (self *SetOp) Eval(vm *VM, pc PC) (PC, error) {
 		s.Add(v)
 	}
 
-	vm.task.Stack.Push(NewVal(&AbcLib.SetType, s))
+	vm.task.Stack.PushBack(NewVal(&AbcLib.SetType, s))
 	return vm.Eval(pc + 1)
 }
 

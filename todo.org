@@ -1,10 +1,8 @@
+* use deque as base type in Set
 * add deque type to abc lib
 * add deque reader []
-* use deque as base type in Set
-* use deque as base type in Stack
 * add char literals
 ** add reader @A
-* --
 * fib
 ** add bench op
 * faster eval?
