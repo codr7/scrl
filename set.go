@@ -6,37 +6,32 @@ import (
 	"strings"
 )
 
-type SetItem[K, V any] struct {
-	key   K
-	value V
+type Set[T any] struct {
+	compare Compare[T]
+	items   []T
 }
 
-type Set[K, V any] struct {
-	compare Compare[K]
-	items   []SetItem[K, V]
+func NewSet[T any](compare Compare[T]) *Set[T] {
+	return new(Set[T]).Init(compare)
 }
 
-func NewSet[K, V any](compare Compare[K]) *Set[K, V] {
-	return new(Set[K, V]).Init(compare)
-}
-
-func (self *Set[K, V]) Init(compare Compare[K]) *Set[K, V] {
+func (self *Set[T]) Init(compare Compare[T]) *Set[T] {
 	self.compare = compare
 	return self
 }
 
-func (self Set[K, V]) Index(key K) (int, *V) {
+func (self Set[T]) Index(v T) (int, *T) {
 	min, max := 0, len(self.items)
 
 	for min < max {
 		i := (min + max) / 2
 		it := self.items[i]
 
-		switch self.compare(key, it.key) {
+		switch self.compare(v, it) {
 		case Lt:
 			max = i
 		case Eq:
-			return i, &it.value
+			return i, &it
 		case Gt:
 			min = i + 1
 		}
@@ -45,21 +40,21 @@ func (self Set[K, V]) Index(key K) (int, *V) {
 	return min, nil
 }
 
-func (self Set[K, V]) Clone() *Set[K, V] {
-	dst := NewSet[K, V](self.compare)
-	dst.items = make([]SetItem[K, V], len(self.items))
+func (self Set[T]) Clone() *Set[T] {
+	dst := NewSet[T](self.compare)
+	dst.items = make([]T, len(self.items))
 	copy(dst.items, self.items)
 	return dst
 }
 
-func (self Set[K, V]) Find(key K) *V {
-	_, found := self.Index(key)
+func (self Set[T]) Find(v T) *T {
+	_, found := self.Index(v)
 	return found
 }
 
-func (self Set[K, V]) Each(f func(key, val interface{}) bool) bool {
+func (self Set[T]) Each(f func(any) bool) bool {
 	for _, it := range self.items {
-		if !f(it.key, it.value) {
+		if !f(it) {
 			return false
 		}
 	}
@@ -67,21 +62,21 @@ func (self Set[K, V]) Each(f func(key, val interface{}) bool) bool {
 	return true
 }
 
-func (self *Set[K, V]) Add(key K, val V) bool {
-	i, found := self.Index(key)
+func (self *Set[T]) Add(v T) bool {
+	i, found := self.Index(v)
 
 	if found != nil {
 		return false
 	}
 
-	self.items = append(self.items, SetItem[K, V]{})
+	self.items = append(self.items, v)
 	copy(self.items[i+1:], self.items[i:])
-	self.items[i] = SetItem[K, V]{key, val}
+	self.items[i] = v
 	return true
 }
 
-func (self *Set[K, V]) Remove(key K) *V {
-	i, found := self.Index(key)
+func (self *Set[T]) Remove(v T) *T {
+	i, found := self.Index(v)
 
 	if found != nil {
 		self.items = self.items[:i+copy(self.items[i:], self.items[i+1:])]
@@ -90,31 +85,15 @@ func (self *Set[K, V]) Remove(key K) *V {
 	return found
 }
 
-func (self Set[K, V]) Keys() []K {
-	out := make([]K, len(self.items))
-
-	for i, it := range self.items {
-		out[i] = it.key
-	}
-
-	return out
+func (self Set[T]) Items() []T {
+	return self.items
 }
 
-func (self Set[K, V]) Values() []V {
-	out := make([]V, len(self.items))
-
-	for i, it := range self.items {
-		out[i] = it.value
-	}
-
-	return out
-}
-
-func (self Set[K, V]) Len() int {
+func (self Set[T]) Len() int {
 	return len(self.items)
 }
 
-func (self Set[K, V]) Dump(out io.Writer) error {
+func (self Set[T]) Dump(out io.Writer) error {
 	if _, err := io.WriteString(out, "{"); err != nil {
 		return err
 	}
@@ -126,7 +105,7 @@ func (self Set[K, V]) Dump(out io.Writer) error {
 			}
 		}
 
-		if _, err := fmt.Fprint(out, "%v %v", it.key, it.value); err != nil {
+		if _, err := fmt.Fprint(out, it); err != nil {
 			return err
 		}
 	}
@@ -138,7 +117,7 @@ func (self Set[K, V]) Dump(out io.Writer) error {
 	return nil
 }
 
-func (self Set[K, V]) String() string {
+func (self Set[T]) String() string {
 	var out strings.Builder
 	self.Dump(&out)
 	return out.String()

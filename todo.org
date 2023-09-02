@@ -1,5 +1,3 @@
-* rename Slice to Set
-** reader
 * add pair type
 ** add pair reader with :
 ** handle pairs in slice op

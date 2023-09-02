@@ -66,8 +66,8 @@ func NewSetOp(pos Pos, itemCount int) *SetOp {
 func (self *SetOp) Eval(vm *VM, pc PC) (PC, error) {
 	s := NewValSet(ValCompare)
 
-	for i, v := range vm.task.Stack.Cut(self.itemCount) {
-		s.Add(NewVal(&AbcLib.IntType, i), v)
+	for _, v := range vm.task.Stack.Cut(self.itemCount) {
+		s.Add(v)
 	}
 
 	vm.task.Stack.Push(NewVal(&AbcLib.SetType, s))

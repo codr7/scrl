@@ -59,8 +59,8 @@ func ValCompare(l, r Val) int {
 	return l.Compare(r)
 }
 
-type ValSet = Set[Val, Val]
+type ValSet = Set[Val]
 
 func NewValSet(compare Compare[Val]) *ValSet {
-	return NewSet[Val, Val](ValCompare)
+	return NewSet[Val](ValCompare)
 }
