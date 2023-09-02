@@ -1,6 +1,6 @@
-* scrl
+# scrl
 
-** pairs
+## pairs
 New pairs may be created using `:`.
 
 ```
@@ -9,7 +9,7 @@ New pairs may be created using `:`.
 [1:2]
 ```
 
-** sets
+## sets
 Sets are ordered collections of values.
 New sets may be created using `{...}`.
 
