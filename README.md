@@ -3,6 +3,16 @@
 
 It's designed to complement the host language by adding a convenient meta level on top that's completely under the users control.
 
+## setup
+
+The REPL may be started from a shell like this:
+
+```
+$ go run main/scrl.go
+scrl v1
+  
+```
+
 ## types
 `type-of` may be used to get the type of an expression.
 
