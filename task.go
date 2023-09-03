@@ -2,6 +2,8 @@ package scrl
 
 type PC = int
 
+type Stack = Deque[Val]
+
 type Task struct {
 	Stack Stack
 	Env   BasicEnv

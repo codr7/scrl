@@ -1,7 +1,6 @@
 package scrl
 
 import (
-	"fmt"
 	"io"
 	"strings"
 )
@@ -74,16 +73,8 @@ func (self Set[T]) Dump(out io.Writer) error {
 		return err
 	}
 
-	for i, it := range self.items {
-		if i > 0 {
-			if _, err := io.WriteString(out, " "); err != nil {
-				return err
-			}
-		}
-
-		if _, err := fmt.Fprint(out, it); err != nil {
-			return err
-		}
+	if err := self.DumpItems(out); err != nil {
+		return err
 	}
 
 	if _, err := io.WriteString(out, "}"); err != nil {

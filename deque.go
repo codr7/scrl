@@ -1,5 +1,11 @@
 package scrl
 
+import (
+	"fmt"
+	"io"
+	"strings"
+)
+
 type Deque[T any] struct {
 	items []T
 }
@@ -72,4 +78,42 @@ func (self Deque[T]) Each(f func(T) bool) bool {
 	}
 
 	return true
+}
+
+func (self Deque[T]) DumpItems(out io.Writer) error {
+	for i, it := range self.items {
+		if i > 0 {
+			if _, err := io.WriteString(out, " "); err != nil {
+				return err
+			}
+		}
+
+		if _, err := fmt.Fprint(out, it); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (self Deque[T]) Dump(out io.Writer) error {
+	if _, err := io.WriteString(out, "["); err != nil {
+		return err
+	}
+
+	if err := self.DumpItems(out); err != nil {
+		return err
+	}
+
+	if _, err := io.WriteString(out, "]"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (self Deque[T]) String() string {
+	var out strings.Builder
+	self.Dump(&out)
+	return out.String()
 }
