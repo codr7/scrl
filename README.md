@@ -19,7 +19,7 @@
 [Meta]
 ```
 
-## integers
+### integers
 
 ```
   1 2 3
@@ -27,7 +27,7 @@
 [1 2 3]
 ```
 
-## booleans
+### booleans
 Booleans have one of two values, `T` or `F`.
 
 ```
@@ -36,7 +36,7 @@ Booleans have one of two values, `T` or `F`.
 [T F]
 ```
 
-## strings
+### strings
 New strings may be created using `"..."`.
 
 ```
@@ -45,7 +45,7 @@ New strings may be created using `"..."`.
 ["foo"]
 ```
 
-## pairs
+### pairs
 New pairs may be created using `:`.
 
 ```
@@ -54,7 +54,7 @@ New pairs may be created using `:`.
 [1:2]
 ```
 
-## deques
+### deques
 Deques are double ended queues of values.
 New deques may be created using `[...]`.
 
@@ -64,7 +64,7 @@ New deques may be created using `[...]`.
 [[3 2 1]]
 ```
 
-## sets
+### sets
 Sets are ordered collections of values.
 New sets may be created using `{...}`.
 
