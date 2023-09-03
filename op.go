@@ -11,6 +11,34 @@ type Op interface {
 	Dump(out io.Writer) error
 }
 
+type AndOp struct {
+	pos     Pos
+	falsePC PC
+}
+
+func NewAndOp(pos Pos, falsePC PC) *AndOp {
+	return &AndOp{pos: pos, falsePC: falsePC}
+}
+
+func (self *AndOp) Eval(vm *VM, pc PC) (PC, error) {
+	v := vm.task.Stack.PeekBack()
+
+	if !v.IsTrue() {
+		return vm.Eval(self.falsePC)
+	}
+
+	vm.task.Stack.PopBack()
+	return vm.Eval(pc + 1)
+}
+
+func (self *AndOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "And %v", self.falsePC); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type DequeOp struct {
 	pos       Pos
 	itemCount int
@@ -28,6 +56,34 @@ func (self *DequeOp) Eval(vm *VM, pc PC) (PC, error) {
 
 func (self *DequeOp) Dump(out io.Writer) error {
 	if _, err := fmt.Fprintf(out, "Deque %v", self.itemCount); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type OrOp struct {
+	pos    Pos
+	truePC PC
+}
+
+func NewOrOp(pos Pos, truePC PC) *OrOp {
+	return &OrOp{pos: pos, truePC: truePC}
+}
+
+func (self *OrOp) Eval(vm *VM, pc PC) (PC, error) {
+	v := vm.task.Stack.PeekBack()
+
+	if v.IsTrue() {
+		return vm.Eval(self.truePC)
+	}
+
+	vm.task.Stack.PopBack()
+	return vm.Eval(pc + 1)
+}
+
+func (self *OrOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "Or %v", self.truePC); err != nil {
 		return err
 	}
 

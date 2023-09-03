@@ -3,6 +3,7 @@ package scrl
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -17,6 +18,7 @@ type AbcLibT struct {
 	BoolType  BoolType
 	DequeType DequeType
 	IntType   IntType
+	MacroType MacroType
 	MetaType  BasicType
 	PairType  PairType
 	PrimType  PrimType
@@ -30,6 +32,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BindType(&self.BoolType, "Bool")
 	self.BindType(&self.DequeType, "Deque")
 	self.BindType(&self.IntType, "Int")
+	self.BindType(&self.MacroType, "Macro")
 	self.BindType(&self.MetaType, "Meta")
 	self.BindType(&self.PairType, "Pair")
 	self.BindType(&self.PrimType, "Prim")
@@ -38,6 +41,38 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 
 	self.Bind("T", NewVal(&self.BoolType, true))
 	self.Bind("F", NewVal(&self.BoolType, false))
+
+	self.BindMacro("and",
+		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			andPC := vm.Emit(true)
+
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			vm.Ops[andPC] = NewAndOp(pos, vm.EmitPC())
+			return nil
+		})
+
+	self.BindMacro("or",
+		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			orPC := vm.Emit(true)
+
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			vm.Ops[orPC] = NewOrOp(pos, vm.EmitPC())
+			return nil
+		})
 
 	self.BindPrim("=", 2,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
@@ -76,6 +111,13 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			r := vm.task.Stack.PopBack()
 			l := vm.task.Stack.PopBack()
 			vm.task.Stack.PushBack(NewVal(&self.IntType, l.d.(int)-r.d.(int)))
+			return pc, nil
+		})
+
+	self.BindPrim("say", 1,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			vm.task.Stack.PopBack().Write(os.Stdout)
+			io.WriteString(os.Stdout, "\n")
 			return pc, nil
 		})
 
@@ -148,6 +190,14 @@ func (_ IntType) Compare(l, r Val) int {
 
 func (_ IntType) IsTrue(v Val) bool {
 	return v.d != 0
+}
+
+type MacroType struct {
+	BasicType
+}
+
+func (_ MacroType) Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error {
+	return v.d.(*Macro).Emit(args, vm, env, pos)
 }
 
 type PairType struct {

@@ -32,21 +32,43 @@ scrl v1
 [Meta]
 ```
 
+### booleans
+Booleans have one of two values, `T` or `F`.
+
+```
+  or T F
+
+[T]
+```
+
+All values have boolean representations; many are unconditionally true, 0 and empty sequences are false.
+
+```
+  and "foo" 42
+
+[42]
+```
+
+Logical operatos are short-circuiting.
+
+```
+  and T say "hello"
+
+hello
+[]
+```
+```
+  or T say "hello"
+
+[T]
+```
+
 ### integers
 
 ```
   + 1 2
   
 [3]
-```
-
-### booleans
-Booleans have one of two values, `T` or `F`.
-
-```
-  T F
-
-[T F]
 ```
 
 ### strings
