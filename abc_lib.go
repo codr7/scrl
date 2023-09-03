@@ -39,6 +39,46 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.Bind("T", NewVal(&self.BoolType, true))
 	self.Bind("F", NewVal(&self.BoolType, false))
 
+	self.BindPrim("=", 2,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			r := vm.task.Stack.PopBack()
+			l := vm.task.Stack.PopBack()
+			vm.task.Stack.PushBack(NewVal(&self.BoolType, l.Eq(r)))
+			return pc, nil
+		})
+
+	self.BindPrim("<", 2,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			r := vm.task.Stack.PopBack()
+			l := vm.task.Stack.PopBack()
+			vm.task.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == -1))
+			return pc, nil
+		})
+
+	self.BindPrim(">", 2,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			r := vm.task.Stack.PopBack()
+			l := vm.task.Stack.PopBack()
+			vm.task.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == 1))
+			return pc, nil
+		})
+
+	self.BindPrim("+", 2,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			r := vm.task.Stack.PopBack()
+			l := vm.task.Stack.PopBack()
+			vm.task.Stack.PushBack(NewVal(&self.IntType, l.d.(int)+r.d.(int)))
+			return pc, nil
+		})
+
+	self.BindPrim("-", 2,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			r := vm.task.Stack.PopBack()
+			l := vm.task.Stack.PopBack()
+			vm.task.Stack.PushBack(NewVal(&self.IntType, l.d.(int)-r.d.(int)))
+			return pc, nil
+		})
+
 	self.BindPrim("trace", 0,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
 			vm.Trace = !vm.Trace

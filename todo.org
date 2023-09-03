@@ -1,6 +1,8 @@
-* add char literals
-** add reader @A
+* add and/or
+** add macros
 * fib
+** add if macro
 ** add bench op
 * faster eval?
-* add and/or
+* add char literals
+** add reader @A @b \n (@13) \t (@9) \s (@32)

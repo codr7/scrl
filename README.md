@@ -35,9 +35,9 @@ scrl v1
 ### integers
 
 ```
-  1 2 3
-
-[1 2 3]
+  + 1 2
+  
+[3]
 ```
 
 ### booleans
