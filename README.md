@@ -1,4 +1,7 @@
 # scrl
+`scrl` is a scripting language implemented and embedded in Go.
+
+It's designed to complement the host language by adding a convenient meta level on top that's completely under the users control.
 
 ## types
 `type-of` may be used to get the type of an expression.
