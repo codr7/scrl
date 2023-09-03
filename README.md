@@ -108,3 +108,19 @@ New sets may be created using `{...}`.
   
 [{1 2 3}]
 ```
+
+## debugging
+`trace` may be used to toggle VM tracing.
+
+```
+  trace
+
+[T]
+  1 2 3
+
+3 Push 1
+5 Push 2
+7 Push 3
+9 Stop
+[T 1 2 3]
+```
