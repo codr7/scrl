@@ -41,7 +41,7 @@ Booleans have one of two values, `T` or `F`.
 [T]
 ```
 
-All values have boolean representations; many are unconditionally true, 0 and empty sequences are false.
+All values have boolean representations; many are unconditionally `T`, `0` and empty sequences are `F`.
 
 ```
   and "foo" 42
