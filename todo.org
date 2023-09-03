@@ -1,7 +1,6 @@
-* add deque type to abc lib
-* add deque reader []
 * add char literals
 ** add reader @A
 * fib
 ** add bench op
 * faster eval?
+* add and/or

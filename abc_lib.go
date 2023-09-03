@@ -12,6 +12,50 @@ func init() {
 	AbcLib.Init("abc")
 }
 
+type AbcLibT struct {
+	BasicLib
+	BoolType  BoolType
+	DequeType DequeType
+	IntType   IntType
+	MetaType  BasicType
+	PairType  PairType
+	PrimType  PrimType
+	SetType   SetType
+	StrType   StrType
+}
+
+func (self *AbcLibT) Init(name string) *AbcLibT {
+	self.BasicLib.Init(name)
+
+	self.BindType(&self.BoolType, "Bool")
+	self.BindType(&self.DequeType, "Deque")
+	self.BindType(&self.IntType, "Int")
+	self.BindType(&self.MetaType, "Meta")
+	self.BindType(&self.PairType, "Pair")
+	self.BindType(&self.PrimType, "Prim")
+	self.BindType(&self.SetType, "Set")
+	self.BindType(&self.StrType, "Str")
+
+	self.Bind("T", NewVal(&self.BoolType, true))
+	self.Bind("F", NewVal(&self.BoolType, false))
+
+	self.BindPrim("trace", 0,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			vm.Trace = !vm.Trace
+			vm.task.Stack.PushBack(NewVal(&self.BoolType, vm.Trace))
+			return pc, nil
+		})
+
+	self.BindPrim("type-of", 1,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			v := vm.task.Stack.PopBack()
+			vm.task.Stack.PushBack(NewVal(&self.MetaType, v.t))
+			return pc, nil
+		})
+
+	return self
+}
+
 type BoolType struct {
 	BasicType
 }
@@ -30,6 +74,20 @@ func (_ BoolType) Dump(v Val, out io.Writer) error {
 	}
 
 	return err
+}
+
+type ValDeque = Deque[Val]
+
+func NewValDeque(items []Val) *ValDeque {
+	return NewDeque[Val](items)
+}
+
+type DequeType struct {
+	BasicType
+}
+
+func (_ DequeType) IsTrue(v Val) bool {
+	return v.d.(*ValDeque).Len() > 0
 }
 
 type IntType struct {
@@ -119,8 +177,8 @@ func (_ StrType) Dump(v Val, out io.Writer) error {
 
 type ValSet = Set[Val]
 
-func NewValSet(compare Compare[Val]) *ValSet {
-	return NewSet[Val](ValCompare, nil)
+func NewValSet(items []Val) *ValSet {
+	return NewSet[Val](ValCompare, items)
 }
 
 type SetType struct {
@@ -129,36 +187,4 @@ type SetType struct {
 
 func (_ SetType) IsTrue(v Val) bool {
 	return v.d.(*ValSet).Len() > 0
-}
-
-type AbcLibT struct {
-	BasicLib
-	BoolType BoolType
-	IntType  IntType
-	PairType PairType
-	PrimType PrimType
-	SetType  SetType
-	StrType  StrType
-}
-
-func (self *AbcLibT) Init(name string) *AbcLibT {
-	self.BasicLib.Init(name)
-	self.BoolType.Init("Bool")
-	self.IntType.Init("Int")
-	self.PairType.Init("Pair")
-	self.PrimType.Init("Prim")
-	self.SetType.Init("Set")
-	self.StrType.Init("Str")
-
-	self.Bind("T", NewVal(&self.BoolType, true))
-	self.Bind("F", NewVal(&self.BoolType, false))
-
-	self.Bind("trace", NewVal(&self.PrimType, NewPrim("trace", 0,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
-			vm.Trace = !vm.Trace
-			vm.task.Stack.PushBack(NewVal(&self.BoolType, vm.Trace))
-			return pc, nil
-		})))
-
-	return self
 }

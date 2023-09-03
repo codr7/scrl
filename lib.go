@@ -19,3 +19,12 @@ func (self *BasicLib) Init(name string) *BasicLib {
 func (self BasicLib) Name() string {
 	return self.name
 }
+
+func (self *BasicLib) BindPrim(name string, arity int, body PrimBody) {
+	self.Bind(name, NewVal(&AbcLib.PrimType, NewPrim(name, arity, body)))
+}
+
+func (self *BasicLib) BindType(t Type, name string) {
+	t.Init(name)
+	self.Bind(name, NewVal(&AbcLib.MetaType, t))
+}

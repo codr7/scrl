@@ -57,6 +57,8 @@ func ReadForm(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	switch c {
 	case '(':
 		return ReadList(vm, in, out, pos)
+	case '[':
+		return ReadDeque(vm, in, out, pos)
 	case '{':
 		return ReadSet(vm, in, out, pos)
 	case '"':
@@ -74,6 +76,50 @@ func ReadForm(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	}
 
 	return fmt.Errorf("Invalid syntax: %v", c)
+}
+
+func ReadBody(vm *VM, in *bufio.Reader, out *Forms, pos *Pos, closingChar rune) error {
+	for {
+		c, _, err := in.ReadRune()
+
+		if err != nil {
+			if err == io.EOF {
+				return fmt.Errorf("Missing %v", closingChar)
+			}
+
+			return err
+		}
+
+		if c == closingChar {
+			pos.column++
+			break
+		} else {
+			in.UnreadRune()
+		}
+
+		if err := ReadForm(vm, in, out, pos); err != nil {
+			if err == io.EOF {
+				return fmt.Errorf("Missing %v", closingChar)
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func ReadDeque(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+	fpos := *pos
+	pos.column++
+	var body Forms
+
+	if err := ReadBody(vm, in, &body, pos, ']'); err != nil {
+		return err
+	}
+
+	out.PushBack(NewDequeForm(fpos, body.items...))
+	return nil
 }
 
 func ReadId(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
@@ -151,31 +197,8 @@ func ReadList(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	pos.column++
 	var body Forms
 
-	for {
-		c, _, err := in.ReadRune()
-
-		if err != nil {
-			if err == io.EOF {
-				return fmt.Errorf("Open list")
-			}
-
-			return err
-		}
-
-		if c == ')' {
-			pos.column++
-			break
-		} else {
-			in.UnreadRune()
-		}
-
-		if err := ReadForm(vm, in, &body, pos); err != nil {
-			if err == io.EOF {
-				return fmt.Errorf("Open list")
-			}
-
-			return err
-		}
+	if err := ReadBody(vm, in, &body, pos, ')'); err != nil {
+		return err
 	}
 
 	out.PushBack(NewListForm(fpos, body.items...))
@@ -205,31 +228,8 @@ func ReadSet(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	pos.column++
 	var body Forms
 
-	for {
-		c, _, err := in.ReadRune()
-
-		if err != nil {
-			if err == io.EOF {
-				return fmt.Errorf("Open set")
-			}
-
-			return err
-		}
-
-		if c == '}' {
-			pos.column++
-			break
-		} else {
-			in.UnreadRune()
-		}
-
-		if err := ReadForm(vm, in, &body, pos); err != nil {
-			if err == io.EOF {
-				return fmt.Errorf("Open set")
-			}
-
-			return err
-		}
+	if err := ReadBody(vm, in, &body, pos, '}'); err != nil {
+		return err
 	}
 
 	out.PushBack(NewSetForm(fpos, body.items...))

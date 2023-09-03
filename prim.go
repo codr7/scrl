@@ -24,7 +24,7 @@ func (self *Prim) Init(name string, arity int, body PrimBody) *Prim {
 }
 
 func (self *Prim) Call(vm *VM, pos Pos, pc PC) (PC, error) {
-	return self.body(self, vm, pos, pc+1)
+	return self.body(self, vm, pos, pc)
 }
 
 func (self *Prim) String() string {

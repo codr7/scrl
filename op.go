@@ -11,6 +11,29 @@ type Op interface {
 	Dump(out io.Writer) error
 }
 
+type DequeOp struct {
+	pos       Pos
+	itemCount int
+}
+
+func NewDequeOp(pos Pos, itemCount int) *DequeOp {
+	return &DequeOp{pos: pos, itemCount: itemCount}
+}
+
+func (self *DequeOp) Eval(vm *VM, pc PC) (PC, error) {
+	d := NewValDeque(vm.task.Stack.Cut(self.itemCount))
+	vm.task.Stack.PushBack(NewVal(&AbcLib.DequeType, d))
+	return vm.Eval(pc + 1)
+}
+
+func (self *DequeOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "Deque %v", self.itemCount); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type PairOp struct {
 	pos Pos
 }
@@ -44,7 +67,13 @@ func NewPrimCallOp(pos Pos, target *Prim) *PrimCallOp {
 }
 
 func (self *PrimCallOp) Eval(vm *VM, pc PC) (PC, error) {
-	return self.target.Call(vm, self.pos, pc)
+	pc, err := self.target.Call(vm, self.pos, pc+1)
+
+	if err != nil {
+		return pc, err
+	}
+
+	return vm.Eval(pc)
 }
 
 func (self *PrimCallOp) Dump(out io.Writer) error {
@@ -87,12 +116,7 @@ func NewSetOp(pos Pos, itemCount int) *SetOp {
 }
 
 func (self *SetOp) Eval(vm *VM, pc PC) (PC, error) {
-	s := NewValSet(ValCompare)
-
-	for _, v := range vm.task.Stack.Cut(self.itemCount) {
-		s.Add(v)
-	}
-
+	s := NewValSet(vm.task.Stack.Cut(self.itemCount))
 	vm.task.Stack.PushBack(NewVal(&AbcLib.SetType, s))
 	return vm.Eval(pc + 1)
 }
