@@ -6,17 +6,19 @@ const (
 	VERSION = 1
 )
 
+type PC = int
+type Stack = Deque[Val]
+
 type VM struct {
 	Trace bool
+	Stack Stack
+	Env   BasicEnv
 	Ops   []Op
-
-	main Task
-	task *Task
 }
 
 func (self *VM) Init() *VM {
-	self.main.Init(nil)
-	self.task = &self.main
+	self.Stack.Init(nil)
+	self.Env.Init(nil)
 	return self
 }
 
@@ -32,10 +34,6 @@ func (self *VM) Emit(trace bool) PC {
 	pc := self.EmitPC()
 	self.Ops = append(self.Ops, nil)
 	return pc
-}
-
-func (self *VM) Task() *Task {
-	return self.task
 }
 
 func (self *VM) Eval(pc PC) (PC, error) {

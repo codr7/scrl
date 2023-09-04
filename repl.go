@@ -43,7 +43,7 @@ func REPL(vm *VM) {
 
 			buf.Reset()
 
-			if err := forms.Emit(vm, &vm.task.Env); err != nil {
+			if err := forms.Emit(vm, &vm.Env); err != nil {
 				fmt.Println(err)
 				goto NEXT
 			}
@@ -52,11 +52,11 @@ func REPL(vm *VM) {
 
 			if _, err := vm.Eval(pc); err != nil {
 				fmt.Println(err)
-				vm.task.Stack.Clear()
+				vm.Stack.Clear()
 				goto NEXT
 			}
 		NEXT:
-			if err := vm.task.Stack.Dump(out); err != nil {
+			if err := vm.Stack.Dump(out); err != nil {
 				log.Fatal(err)
 			}
 

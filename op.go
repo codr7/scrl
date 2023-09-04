@@ -21,13 +21,13 @@ func NewAndOp(pos Pos, falsePC PC) *AndOp {
 }
 
 func (self *AndOp) Eval(vm *VM, pc PC) (PC, error) {
-	v := vm.task.Stack.PeekBack()
+	v := vm.Stack.PeekBack()
 
 	if !v.IsTrue() {
 		return vm.Eval(self.falsePC)
 	}
 
-	vm.task.Stack.PopBack()
+	vm.Stack.PopBack()
 	return vm.Eval(pc + 1)
 }
 
@@ -49,8 +49,8 @@ func NewDequeOp(pos Pos, itemCount int) *DequeOp {
 }
 
 func (self *DequeOp) Eval(vm *VM, pc PC) (PC, error) {
-	d := NewValDeque(vm.task.Stack.Cut(self.itemCount))
-	vm.task.Stack.PushBack(NewVal(&AbcLib.DequeType, d))
+	d := NewValDeque(vm.Stack.Cut(self.itemCount))
+	vm.Stack.PushBack(NewVal(&AbcLib.DequeType, d))
 	return vm.Eval(pc + 1)
 }
 
@@ -72,13 +72,13 @@ func NewOrOp(pos Pos, truePC PC) *OrOp {
 }
 
 func (self *OrOp) Eval(vm *VM, pc PC) (PC, error) {
-	v := vm.task.Stack.PeekBack()
+	v := vm.Stack.PeekBack()
 
 	if v.IsTrue() {
 		return vm.Eval(self.truePC)
 	}
 
-	vm.task.Stack.PopBack()
+	vm.Stack.PopBack()
 	return vm.Eval(pc + 1)
 }
 
@@ -99,9 +99,9 @@ func NewPairOp(pos Pos) *PairOp {
 }
 
 func (self *PairOp) Eval(vm *VM, pc PC) (PC, error) {
-	r := vm.task.Stack.PopBack()
-	l := vm.task.Stack.PopBack()
-	vm.task.Stack.PushBack(NewVal(&AbcLib.PairType, NewPair(l, r)))
+	r := vm.Stack.PopBack()
+	l := vm.Stack.PopBack()
+	vm.Stack.PushBack(NewVal(&AbcLib.PairType, NewPair(l, r)))
 	return vm.Eval(pc + 1)
 }
 
@@ -150,7 +150,7 @@ func NewPushOp(pos Pos, val Val) *PushOp {
 }
 
 func (self *PushOp) Eval(vm *VM, pc PC) (PC, error) {
-	vm.task.Stack.PushBack(self.val)
+	vm.Stack.PushBack(self.val)
 	return vm.Eval(pc + 1)
 }
 
@@ -172,8 +172,8 @@ func NewSetOp(pos Pos, itemCount int) *SetOp {
 }
 
 func (self *SetOp) Eval(vm *VM, pc PC) (PC, error) {
-	s := NewValSet(vm.task.Stack.Cut(self.itemCount))
-	vm.task.Stack.PushBack(NewVal(&AbcLib.SetType, s))
+	s := NewValSet(vm.Stack.Cut(self.itemCount))
+	vm.Stack.PushBack(NewVal(&AbcLib.SetType, s))
 	return vm.Eval(pc + 1)
 }
 

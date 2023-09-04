@@ -76,47 +76,47 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 
 	self.BindPrim("=", 2,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
-			r := vm.task.Stack.PopBack()
-			l := vm.task.Stack.PopBack()
-			vm.task.Stack.PushBack(NewVal(&self.BoolType, l.Eq(r)))
+			r := vm.Stack.PopBack()
+			l := vm.Stack.PopBack()
+			vm.Stack.PushBack(NewVal(&self.BoolType, l.Eq(r)))
 			return pc, nil
 		})
 
 	self.BindPrim("<", 2,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
-			r := vm.task.Stack.PopBack()
-			l := vm.task.Stack.PopBack()
-			vm.task.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == -1))
+			r := vm.Stack.PopBack()
+			l := vm.Stack.PopBack()
+			vm.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == -1))
 			return pc, nil
 		})
 
 	self.BindPrim(">", 2,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
-			r := vm.task.Stack.PopBack()
-			l := vm.task.Stack.PopBack()
-			vm.task.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == 1))
+			r := vm.Stack.PopBack()
+			l := vm.Stack.PopBack()
+			vm.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == 1))
 			return pc, nil
 		})
 
 	self.BindPrim("+", 2,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
-			r := vm.task.Stack.PopBack()
-			l := vm.task.Stack.PopBack()
-			vm.task.Stack.PushBack(NewVal(&self.IntType, l.d.(int)+r.d.(int)))
+			r := vm.Stack.PopBack()
+			l := vm.Stack.PopBack()
+			vm.Stack.PushBack(NewVal(&self.IntType, l.d.(int)+r.d.(int)))
 			return pc, nil
 		})
 
 	self.BindPrim("-", 2,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
-			r := vm.task.Stack.PopBack()
-			l := vm.task.Stack.PopBack()
-			vm.task.Stack.PushBack(NewVal(&self.IntType, l.d.(int)-r.d.(int)))
+			r := vm.Stack.PopBack()
+			l := vm.Stack.PopBack()
+			vm.Stack.PushBack(NewVal(&self.IntType, l.d.(int)-r.d.(int)))
 			return pc, nil
 		})
 
 	self.BindPrim("say", 1,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
-			vm.task.Stack.PopBack().Write(os.Stdout)
+			vm.Stack.PopBack().Write(os.Stdout)
 			io.WriteString(os.Stdout, "\n")
 			return pc, nil
 		})
@@ -124,14 +124,14 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BindPrim("trace", 0,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
 			vm.Trace = !vm.Trace
-			vm.task.Stack.PushBack(NewVal(&self.BoolType, vm.Trace))
+			vm.Stack.PushBack(NewVal(&self.BoolType, vm.Trace))
 			return pc, nil
 		})
 
 	self.BindPrim("type-of", 1,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
-			v := vm.task.Stack.PopBack()
-			vm.task.Stack.PushBack(NewVal(&self.MetaType, v.t))
+			v := vm.Stack.PopBack()
+			vm.Stack.PushBack(NewVal(&self.MetaType, v.t))
 			return pc, nil
 		})
 
