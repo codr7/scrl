@@ -109,6 +109,23 @@ New sets may be created using `{...}`.
 [{1 2 3}]
 ```
 
+## flow control
+`if` may be used to branch on a condition.
+
+```
+  if F "foo"
+
+[]
+``
+
+`else` may be used to evaluate code when the condition is `F`.
+
+```
+  if F "foo" else "bar"
+
+["bar"]
+````
+
 ## debugging
 `trace` may be used to toggle VM tracing.
 
