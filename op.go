@@ -62,6 +62,54 @@ func (self *DequeOp) Dump(out io.Writer) error {
 	return nil
 }
 
+type GotoOp struct {
+	pos Pos
+	pc  PC
+}
+
+func NewGotoOp(pos Pos, pc PC) *GotoOp {
+	return &GotoOp{pos: pos, pc: pc}
+}
+
+func (self *GotoOp) Eval(vm *VM, pc PC) (PC, error) {
+	return vm.Eval(self.pc)
+}
+
+func (self *GotoOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "Goto %v", self.pc); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type IfOp struct {
+	pos    Pos
+	elsePC PC
+}
+
+func NewIfOp(pos Pos, elsePC PC) *IfOp {
+	return &IfOp{pos: pos, elsePC: elsePC}
+}
+
+func (self *IfOp) Eval(vm *VM, pc PC) (PC, error) {
+	v := vm.Stack.PopBack()
+
+	if v.IsTrue() {
+		return vm.Eval(pc + 1)
+	}
+
+	return vm.Eval(self.elsePC)
+}
+
+func (self *IfOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "If %v", self.elsePC); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type OrOp struct {
 	pos    Pos
 	truePC PC

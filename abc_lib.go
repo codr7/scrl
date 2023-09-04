@@ -58,6 +58,40 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return nil
 		})
 
+	self.BindMacro("if",
+		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			ifPC := vm.Emit(true)
+
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			elsePC := vm.EmitPC()
+
+			if args.Len() > 0 {
+				next := args.PeekFront()
+
+				if f, ok := next.(*IdForm); ok && f.name == "else" {
+					args.PopFront()
+					gotoPC := vm.Emit(true)
+					elsePC = vm.EmitPC()
+
+					if err := args.PopFront().Emit(args, vm, env); err != nil {
+						return err
+					}
+
+					vm.Ops[gotoPC] = NewGotoOp(pos, vm.EmitPC())
+				}
+			}
+
+			vm.Ops[ifPC] = NewIfOp(pos, elsePC)
+			return nil
+		})
+
 	self.BindMacro("or",
 		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
