@@ -29,7 +29,7 @@ func (self PairForm) Emit(args *Forms, vm *Vm, env Env) error {
 		return err
 	}
 
-	vm.Ops[vm.Emit(true)] = NewPairOp(self.pos)
+	vm.Emit(NewPairOp(self.pos), true)
 	return nil
 }
 

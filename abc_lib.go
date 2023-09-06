@@ -51,13 +51,13 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 				return err
 			}
 
-			andPc := vm.Emit(true)
+			andPc := vm.Emit(nil, true)
 
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
 				return err
 			}
 
-			vm.Ops[andPc] = NewAndOp(pos, vm.EmitPc())
+			vm.ops[andPc] = NewAndOp(pos, vm.EmitPc())
 			return nil
 		})
 
@@ -67,13 +67,13 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 				return err
 			}
 
-			vm.Ops[vm.Emit(true)] = &BenchOp
+			vm.Emit(&BenchOp, true)
 
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
 				return err
 			}
 
-			vm.Ops[vm.Emit(true)] = &StopOp
+			vm.Emit(&StopOp, true)
 			return nil
 		})
 
@@ -83,7 +83,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 				return err
 			}
 
-			ifPc := vm.Emit(true)
+			ifPc := vm.Emit(nil, true)
 
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
 				return err
@@ -96,18 +96,18 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 
 				if f, ok := next.(*IdForm); ok && f.name == "else" {
 					args.PopFront()
-					gotoPc := vm.Emit(true)
+					gotoPc := vm.Emit(nil, true)
 					elsePc = vm.EmitPc()
 
 					if err := args.PopFront().Emit(args, vm, env); err != nil {
 						return err
 					}
 
-					vm.Ops[gotoPc] = NewGotoOp(pos, vm.EmitPc())
+					vm.ops[gotoPc] = NewGotoOp(pos, vm.EmitPc())
 				}
 			}
 
-			vm.Ops[ifPc] = NewIfOp(pos, elsePc)
+			vm.ops[ifPc] = NewIfOp(pos, elsePc)
 			return nil
 		})
 
@@ -117,13 +117,13 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 				return err
 			}
 
-			orPc := vm.Emit(true)
+			orPc := vm.Emit(nil, true)
 
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
 				return err
 			}
 
-			vm.Ops[orPc] = NewOrOp(pos, vm.EmitPc())
+			vm.ops[orPc] = NewOrOp(pos, vm.EmitPc())
 			return nil
 		})
 
@@ -310,7 +310,7 @@ func (_ PrimType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
 		}
 	}
 
-	vm.Ops[vm.Emit(true)] = NewPrimCallOp(pos, p)
+	vm.Emit(NewPrimCallOp(pos, p), true)
 	return nil
 }
 

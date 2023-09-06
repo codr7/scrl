@@ -48,7 +48,7 @@ func REPL(vm *Vm) {
 				goto NEXT
 			}
 
-			vm.Ops[vm.Emit(true)] = &StopOp
+			vm.Emit(&StopOp, true)
 
 			if _, err := vm.Eval(pc); err != nil {
 				fmt.Println(err)

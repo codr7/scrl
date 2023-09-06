@@ -22,7 +22,7 @@ func (self *DequeForm) Emit(args *Forms, vm *Vm, env Env) error {
 		return err
 	}
 
-	vm.Ops[vm.Emit(true)] = NewDequeOp(self.pos, len(self.items))
+	vm.Emit(NewDequeOp(self.pos, len(self.items)), true)
 	return nil
 }
 

@@ -284,7 +284,7 @@ type TraceOpT struct{}
 func (self *TraceOpT) Eval(vm *Vm, pc Pc) (Pc, error) {
 	pc++
 	fmt.Fprintf(os.Stdout, "%v ", pc)
-	vm.Ops[pc].Dump(os.Stdout)
+	vm.ops[pc].Dump(os.Stdout)
 	io.WriteString(os.Stdout, "\n")
 	return vm.Eval(pc)
 }

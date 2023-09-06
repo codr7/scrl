@@ -22,7 +22,7 @@ func (self *SetForm) Emit(args *Forms, vm *Vm, env Env) error {
 		return err
 	}
 
-	vm.Ops[vm.Emit(true)] = NewSetOp(self.pos, len(self.items))
+	vm.Emit(NewSetOp(self.pos, len(self.items)), true)
 	return nil
 }
 

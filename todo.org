@@ -1,6 +1,3 @@
-* PC, VM
-* Ops -> ops
-** add Op arg to Emit
 * replace Prim.arity with arg/ret_types
 * add syms
 ** 'foo

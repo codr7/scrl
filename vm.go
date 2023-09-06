@@ -13,7 +13,8 @@ type Vm struct {
 	Trace bool
 	Stack Stack
 	Env   BasicEnv
-	Ops   []Op
+
+	ops []Op
 }
 
 func (self *Vm) Init() *Vm {
@@ -23,19 +24,19 @@ func (self *Vm) Init() *Vm {
 }
 
 func (self *Vm) EmitPc() Pc {
-	return len(self.Ops)
+	return len(self.ops)
 }
 
-func (self *Vm) Emit(trace bool) Pc {
+func (self *Vm) Emit(op Op, trace bool) Pc {
 	if self.Trace && trace {
-		self.Ops[self.Emit(false)] = &TraceOp
+		self.Emit(&TraceOp, false)
 	}
 
 	pc := self.EmitPc()
-	self.Ops = append(self.Ops, nil)
+	self.ops = append(self.ops, op)
 	return pc
 }
 
 func (self *Vm) Eval(pc Pc) (Pc, error) {
-	return self.Ops[pc].Eval(self, pc)
+	return self.ops[pc].Eval(self, pc)
 }
