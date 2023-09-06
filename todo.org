@@ -1,9 +1,10 @@
+* fib
+** fix fun arg lookup
+** bench
 * generalize quoting
 ** read form
 ** add Expr type
 *** add Form.Eq()
-* fib
-** add fun macro
 * faster eval?
 * add echar literals
 ** add reader @A @b \n (@13) \t (@9) \s (@32)
@@ -17,14 +18,14 @@
 s3, e8
 
  fun fib (n) 
-   if < n 2 n else + fib dec n fib - n 2
+   if < n 2 n else + fib - n 1 fib - n 2
 
  bench 100 fib 20
 
 [712]
 
  fun fib(n a b)
-   if > n 1 ret fib dec n b + a b else if z? n a else b
+   if > n 1 ret fib - n 1 b + a b else if = n 0 a else b
 
  bench 10000 fib 70 0 1
 

@@ -12,8 +12,9 @@ type Syms = map[string]*Sym
 type Vm struct {
 	Trace bool
 
-	syms Syms
-	ops  []Op
+	syms  Syms
+	ops   []Op
+	calls Deque[Call]
 }
 
 func (self *Vm) Init() *Vm {

@@ -79,6 +79,37 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return nil
 		})
 
+	self.BindMacro("fun",
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
+			name := args.PopFront().(*IdForm).name
+			var funArgs FunArgs
+			arity := 0
+
+			for _, f := range args.PopFront().(*ListForm).items {
+				funArgs.Add(f.(*IdForm).name, nil)
+				arity++
+			}
+
+			skipPc := vm.Emit(nil, true)
+			startPc := vm.EmitPc()
+
+			fun := NewFun(name, funArgs,
+				func(fun *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+					vm.calls.PushBack(NewCall(pos, fun, stack.Cut(arity), pc))
+					return startPc, nil
+				})
+
+			env.Bind(name, NewVal(&self.FunType, fun))
+
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			vm.Emit(&RetOp, true)
+			vm.ops[skipPc] = NewGotoOp(pos, vm.EmitPc())
+			return nil
+		})
+
 	self.BindMacro("if",
 		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
@@ -129,7 +160,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return nil
 		})
 
-	self.BindFun("=", 2,
+	self.BindFun("=", *new(FunArgs).Add("x", nil).Add("y", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -137,7 +168,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun("<", 2,
+	self.BindFun("<", *new(FunArgs).Add("x", nil).Add("y", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -145,7 +176,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun(">", 2,
+	self.BindFun(">", *new(FunArgs).Add("x", nil).Add("y", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -153,7 +184,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun("+", 2,
+	self.BindFun("+", *new(FunArgs).Add("x", nil).Add("y", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -161,7 +192,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun("-", 2,
+	self.BindFun("-", *new(FunArgs).Add("x", nil).Add("y", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -169,41 +200,41 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun("milliseconds", 1,
+	self.BindFun("milliseconds", *new(FunArgs).Add("v", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			n := stack.PopBack().d.(int)
 			stack.PushBack(NewVal(&self.TimeType, time.Duration(n)*time.Millisecond))
 			return pc, nil
 		})
 
-	self.BindFun("say", 1,
+	self.BindFun("say", *new(FunArgs).Add("v", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			stack.PopBack().Write(os.Stdout)
 			io.WriteString(os.Stdout, "\n")
 			return pc, nil
 		})
 
-	self.BindFun("sym", 1,
+	self.BindFun("sym", *new(FunArgs).Add("s", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			s := vm.Sym(stack.PopBack().d.(string))
 			stack.PushBack(NewVal(&self.SymType, s))
 			return pc, nil
 		})
 
-	self.BindFun("sleep", 1,
+	self.BindFun("sleep", *new(FunArgs).Add("t", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			time.Sleep(stack.PopBack().d.(time.Duration))
 			return pc, nil
 		})
 
-	self.BindFun("trace", 0,
+	self.BindFun("trace", *new(FunArgs),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			vm.Trace = !vm.Trace
 			stack.PushBack(NewVal(&self.BoolType, vm.Trace))
 			return pc, nil
 		})
 
-	self.BindFun("type-of", 1,
+	self.BindFun("type-of", *new(FunArgs).Add("v", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			v := stack.PopBack()
 			stack.PushBack(NewVal(&self.MetaType, v.t))
@@ -311,15 +342,15 @@ type FunType struct {
 }
 
 func (_ FunType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
-	p := v.d.(*Fun)
+	f := v.d.(*Fun)
 
-	for i := 0; i < p.arity; i++ {
+	for i := 0; i < f.Arity(); i++ {
 		if err := args.PopFront().Emit(args, vm, env); err != nil {
 			return err
 		}
 	}
 
-	vm.Emit(NewCallOp(pos, p), true)
+	vm.Emit(NewCallOp(pos, f), true)
 	return nil
 }
 
