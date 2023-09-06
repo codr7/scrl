@@ -1,4 +1,3 @@
-* add EvalError/EmitError
 * generalize quoting
 ** read form
 ** add Expr type
@@ -10,7 +9,7 @@
 ** add reader @A @b \n (@13) \t (@9) \s (@32)
 * add Timestamp type (time.Time)
 * track stack effects when emitting ops
-** add stacks []Stack argument to emit
+** add stacks []*Stack argument to emit
 *** update all
 *** nil value == undefined
 *** add Undefined type

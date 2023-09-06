@@ -2,7 +2,6 @@ package scrl
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strings"
 	"unicode"
@@ -77,7 +76,7 @@ func ReadForm(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 		}
 	}
 
-	return fmt.Errorf("Invalid syntax: %v", c)
+	return NewError(*pos, "Invalid syntax: %v", c)
 }
 
 func ReadBody(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos, closingChar rune) error {
@@ -86,7 +85,7 @@ func ReadBody(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos, closingChar rune) 
 
 		if err != nil {
 			if err == io.EOF {
-				return fmt.Errorf("Missing %v", closingChar)
+				return NewError(*pos, "Missing %v", closingChar)
 			}
 
 			return err
@@ -101,7 +100,7 @@ func ReadBody(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos, closingChar rune) 
 
 		if err := ReadForm(vm, in, out, pos); err != nil {
 			if err == io.EOF {
-				return fmt.Errorf("Missing %v", closingChar)
+				return NewError(*pos, "Missing %v", closingChar)
 			}
 
 			return err
@@ -224,7 +223,7 @@ func ReadPair(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 
 	if err := ReadForm(vm, in, out, pos); err != nil {
 		if err == io.EOF {
-			return fmt.Errorf("Invalid pair")
+			return NewError(*pos, "Invalid pair")
 		}
 
 		return err
@@ -259,7 +258,7 @@ func ReadStr(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 
 		if err != nil {
 			if err == io.EOF {
-				return fmt.Errorf("Open string")
+				return NewError(*pos, "Open string")
 			}
 
 			return err

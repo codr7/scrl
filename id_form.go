@@ -1,7 +1,6 @@
 package scrl
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -24,7 +23,7 @@ func (self *IdForm) Emit(args *Forms, vm *Vm, env Env) error {
 	found := env.Find(self.name)
 
 	if found == nil {
-		return fmt.Errorf("Unknown identifier: %v", self.name)
+		return NewError(self.pos, "Unknown identifier: %v", self.name)
 	}
 
 	if err := found.Emit(args, vm, env, self.pos); err != nil {
