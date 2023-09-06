@@ -22,7 +22,7 @@ type AbcLibT struct {
 	MacroType MacroType
 	MetaType  BasicType
 	PairType  PairType
-	PrimType  PrimType
+	FunType   FunType
 	SetType   SetType
 	StrType   StrType
 	SymType   SymType
@@ -38,7 +38,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BindType(&self.MacroType, "Macro")
 	self.BindType(&self.MetaType, "Meta")
 	self.BindType(&self.PairType, "Pair")
-	self.BindType(&self.PrimType, "Prim")
+	self.BindType(&self.FunType, "Fun")
 	self.BindType(&self.SetType, "Set")
 	self.BindType(&self.StrType, "Str")
 	self.BindType(&self.SymType, "Sym")
@@ -129,75 +129,82 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return nil
 		})
 
-	self.BindPrim("=", 2,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("=", 2,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
 			stack.PushBack(NewVal(&self.BoolType, l.Eq(r)))
 			return pc, nil
 		})
 
-	self.BindPrim("<", 2,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("<", 2,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
 			stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == -1))
 			return pc, nil
 		})
 
-	self.BindPrim(">", 2,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun(">", 2,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
 			stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == 1))
 			return pc, nil
 		})
 
-	self.BindPrim("+", 2,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("+", 2,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
 			stack.PushBack(NewVal(&self.IntType, l.d.(int)+r.d.(int)))
 			return pc, nil
 		})
 
-	self.BindPrim("-", 2,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("-", 2,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
 			stack.PushBack(NewVal(&self.IntType, l.d.(int)-r.d.(int)))
 			return pc, nil
 		})
 
-	self.BindPrim("milliseconds", 1,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("milliseconds", 1,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			n := stack.PopBack().d.(int)
 			stack.PushBack(NewVal(&self.TimeType, time.Duration(n)*time.Millisecond))
 			return pc, nil
 		})
 
-	self.BindPrim("say", 1,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("say", 1,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			stack.PopBack().Write(os.Stdout)
 			io.WriteString(os.Stdout, "\n")
 			return pc, nil
 		})
 
-	self.BindPrim("sleep", 1,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("sym", 1,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			s := vm.Sym(stack.PopBack().d.(string))
+			stack.PushBack(NewVal(&self.SymType, s))
+			return pc, nil
+		})
+
+	self.BindFun("sleep", 1,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			time.Sleep(stack.PopBack().d.(time.Duration))
 			return pc, nil
 		})
 
-	self.BindPrim("trace", 0,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("trace", 0,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			vm.Trace = !vm.Trace
 			stack.PushBack(NewVal(&self.BoolType, vm.Trace))
 			return pc, nil
 		})
 
-	self.BindPrim("type-of", 1,
-		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+	self.BindFun("type-of", 1,
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			v := stack.PopBack()
 			stack.PushBack(NewVal(&self.MetaType, v.t))
 			return pc, nil
@@ -299,12 +306,12 @@ func (_ PairType) Dump(v Val, out io.Writer) error {
 	return nil
 }
 
-type PrimType struct {
+type FunType struct {
 	BasicType
 }
 
-func (_ PrimType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
-	p := v.d.(*Prim)
+func (_ FunType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
+	p := v.d.(*Fun)
 
 	for i := 0; i < p.arity; i++ {
 		if err := args.PopFront().Emit(args, vm, env); err != nil {
@@ -312,7 +319,7 @@ func (_ PrimType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
 		}
 	}
 
-	vm.Emit(NewPrimCallOp(pos, p), true)
+	vm.Emit(NewCallOp(pos, p), true)
 	return nil
 }
 

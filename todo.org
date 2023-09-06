@@ -1,11 +1,8 @@
+* add EvalError/EmitError
 * generalize quoting
 ** read form
 ** add Expr type
 *** add Form.Eq()
-* rename Prim to Fun
-** rename PrimCall to Call
-** replace Prim.arity with arg/ret_types
-* add EvalError/EmitError
 * fib
 ** add fun macro
 * faster eval?

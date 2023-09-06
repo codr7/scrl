@@ -72,11 +72,10 @@ hello
 ```
 
 ### symbols
-New symbols may be created using `'...`.
-If the symbol already exists the same object is returned.
+New symbols may be created using `'...` or by interning strings.
 
 ```
-  = 'foo 'foo
+  = sym "foo" 'foo
 
 [T]
 ```

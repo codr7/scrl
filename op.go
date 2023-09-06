@@ -70,6 +70,33 @@ func (self *BenchOpT) Dump(out io.Writer) error {
 	return err
 }
 
+type CallOp struct {
+	pos    Pos
+	target *Fun
+}
+
+func NewCallOp(pos Pos, target *Fun) *CallOp {
+	return &CallOp{pos: pos, target: target}
+}
+
+func (self *CallOp) Eval(vm *Vm, stack *Stack, pc Pc) (Pc, error) {
+	pc, err := self.target.Call(vm, stack, self.pos, pc+1)
+
+	if err != nil {
+		return pc, err
+	}
+
+	return vm.Eval(pc, stack)
+}
+
+func (self *CallOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "Call %v", self.target); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type DequeOp struct {
 	pos       Pos
 	itemCount int
@@ -186,33 +213,6 @@ func (self *PairOp) Eval(vm *Vm, stack *Stack, pc Pc) (Pc, error) {
 
 func (self *PairOp) Dump(out io.Writer) error {
 	if _, err := io.WriteString(out, "Pair"); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-type PrimCallOp struct {
-	pos    Pos
-	target *Prim
-}
-
-func NewPrimCallOp(pos Pos, target *Prim) *PrimCallOp {
-	return &PrimCallOp{pos: pos, target: target}
-}
-
-func (self *PrimCallOp) Eval(vm *Vm, stack *Stack, pc Pc) (Pc, error) {
-	pc, err := self.target.Call(vm, stack, self.pos, pc+1)
-
-	if err != nil {
-		return pc, err
-	}
-
-	return vm.Eval(pc, stack)
-}
-
-func (self *PrimCallOp) Dump(out io.Writer) error {
-	if _, err := fmt.Fprintf(out, "Prim %v", self.target); err != nil {
 		return err
 	}
 
