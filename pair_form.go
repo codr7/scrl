@@ -20,7 +20,7 @@ func (self *PairForm) Init(pos Pos, left, right Form) *PairForm {
 	return self
 }
 
-func (self PairForm) Emit(args *Forms, vm *VM, env Env) error {
+func (self PairForm) Emit(args *Forms, vm *Vm, env Env) error {
 	if err := self.left.Emit(args, vm, env); err != nil {
 		return err
 	}

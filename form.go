@@ -6,7 +6,7 @@ import (
 
 type Form interface {
 	Pos() Pos
-	Emit(args *Forms, vm *VM, env Env) error
+	Emit(args *Forms, vm *Vm, env Env) error
 	Dump(out io.Writer) error
 }
 

@@ -37,7 +37,7 @@ func (self Val) IsTrue() bool {
 	return self.t.IsTrue(self)
 }
 
-func (self Val) Emit(args *Forms, vm *VM, env Env, pos Pos) error {
+func (self Val) Emit(args *Forms, vm *Vm, env Env, pos Pos) error {
 	return self.t.Emit(self, args, vm, env, pos)
 }
 

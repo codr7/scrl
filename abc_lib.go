@@ -46,7 +46,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.Bind("F", NewVal(&self.BoolType, false))
 
 	self.BindMacro("and",
-		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
 				return err
 			}
@@ -62,7 +62,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindMacro("bench",
-		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
 				return err
 			}
@@ -78,7 +78,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindMacro("if",
-		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
 				return err
 			}
@@ -112,7 +112,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindMacro("or",
-		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
 			if err := args.PopFront().Emit(args, vm, env); err != nil {
 				return err
 			}
@@ -128,7 +128,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindPrim("=", 2,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			r := vm.Stack.PopBack()
 			l := vm.Stack.PopBack()
 			vm.Stack.PushBack(NewVal(&self.BoolType, l.Eq(r)))
@@ -136,7 +136,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindPrim("<", 2,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			r := vm.Stack.PopBack()
 			l := vm.Stack.PopBack()
 			vm.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == -1))
@@ -144,7 +144,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindPrim(">", 2,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			r := vm.Stack.PopBack()
 			l := vm.Stack.PopBack()
 			vm.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == 1))
@@ -152,7 +152,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindPrim("+", 2,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			r := vm.Stack.PopBack()
 			l := vm.Stack.PopBack()
 			vm.Stack.PushBack(NewVal(&self.IntType, l.d.(int)+r.d.(int)))
@@ -160,7 +160,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindPrim("-", 2,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			r := vm.Stack.PopBack()
 			l := vm.Stack.PopBack()
 			vm.Stack.PushBack(NewVal(&self.IntType, l.d.(int)-r.d.(int)))
@@ -168,34 +168,34 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindPrim("milliseconds", 1,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			n := vm.Stack.PopBack().d.(int)
 			vm.Stack.PushBack(NewVal(&self.TimeType, time.Duration(n)*time.Millisecond))
 			return pc, nil
 		})
 
 	self.BindPrim("say", 1,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			vm.Stack.PopBack().Write(os.Stdout)
 			io.WriteString(os.Stdout, "\n")
 			return pc, nil
 		})
 
 	self.BindPrim("sleep", 1,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			time.Sleep(vm.Stack.PopBack().d.(time.Duration))
 			return pc, nil
 		})
 
 	self.BindPrim("trace", 0,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			vm.Trace = !vm.Trace
 			vm.Stack.PushBack(NewVal(&self.BoolType, vm.Trace))
 			return pc, nil
 		})
 
 	self.BindPrim("type-of", 1,
-		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+		func(_ *Prim, vm *Vm, pos Pos, pc PC) (PC, error) {
 			v := vm.Stack.PopBack()
 			vm.Stack.PushBack(NewVal(&self.MetaType, v.t))
 			return pc, nil
@@ -262,7 +262,7 @@ type MacroType struct {
 	BasicType
 }
 
-func (_ MacroType) Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error {
+func (_ MacroType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
 	return v.d.(*Macro).Emit(args, vm, env, pos)
 }
 
@@ -301,7 +301,7 @@ type PrimType struct {
 	BasicType
 }
 
-func (_ PrimType) Emit(v Val, args *Forms, vm *VM, env Env, pos Pos) error {
+func (_ PrimType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
 	p := v.d.(*Prim)
 
 	for i := 0; i < p.arity; i++ {

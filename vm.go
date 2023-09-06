@@ -9,24 +9,24 @@ const (
 type PC = int
 type Stack = Deque[Val]
 
-type VM struct {
+type Vm struct {
 	Trace bool
 	Stack Stack
 	Env   BasicEnv
 	Ops   []Op
 }
 
-func (self *VM) Init() *VM {
+func (self *Vm) Init() *Vm {
 	self.Stack.Init(nil)
 	self.Env.Init(nil)
 	return self
 }
 
-func (self *VM) EmitPC() PC {
+func (self *Vm) EmitPC() PC {
 	return len(self.Ops)
 }
 
-func (self *VM) Emit(trace bool) PC {
+func (self *Vm) Emit(trace bool) PC {
 	if self.Trace && trace {
 		self.Ops[self.Emit(false)] = &TraceOp
 	}
@@ -36,6 +36,6 @@ func (self *VM) Emit(trace bool) PC {
 	return pc
 }
 
-func (self *VM) Eval(pc PC) (PC, error) {
+func (self *Vm) Eval(pc PC) (PC, error) {
 	return self.Ops[pc].Eval(self, pc)
 }

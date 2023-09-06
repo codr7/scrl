@@ -15,7 +15,7 @@ func (self *ItemsForm) Init(pos Pos, items []Form) *ItemsForm {
 	return self
 }
 
-func (self ItemsForm) Emit(args *Forms, vm *VM, env Env) error {
+func (self ItemsForm) Emit(args *Forms, vm *Vm, env Env) error {
 	var fargs Forms
 	fargs.Init(self.items)
 	return fargs.Emit(vm, env)

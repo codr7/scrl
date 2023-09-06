@@ -20,7 +20,7 @@ func (self *IdForm) Init(pos Pos, name string) *IdForm {
 	return self
 }
 
-func (self *IdForm) Emit(args *Forms, vm *VM, env Env) error {
+func (self *IdForm) Emit(args *Forms, vm *Vm, env Env) error {
 	found := env.Find(self.name)
 
 	if found == nil {

@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-func ReadForms(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadForms(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	for {
 		if err := ReadForm(vm, in, out, pos); err != nil {
 			if err == io.EOF {
@@ -20,7 +20,7 @@ func ReadForms(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	}
 }
 
-func SkipWhitespace(vm *VM, in *bufio.Reader, pos *Pos) error {
+func SkipWhitespace(vm *Vm, in *bufio.Reader, pos *Pos) error {
 	for {
 		c, _, err := in.ReadRune()
 
@@ -43,7 +43,7 @@ EXIT:
 	return nil
 }
 
-func ReadForm(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadForm(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	if err := SkipWhitespace(vm, in, pos); err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func ReadForm(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return fmt.Errorf("Invalid syntax: %v", c)
 }
 
-func ReadBody(vm *VM, in *bufio.Reader, out *Forms, pos *Pos, closingChar rune) error {
+func ReadBody(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos, closingChar rune) error {
 	for {
 		c, _, err := in.ReadRune()
 
@@ -109,7 +109,7 @@ func ReadBody(vm *VM, in *bufio.Reader, out *Forms, pos *Pos, closingChar rune) 
 	return nil
 }
 
-func ReadDeque(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadDeque(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	pos.column++
 	var body Forms
@@ -122,7 +122,7 @@ func ReadDeque(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
-func ReadId(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadId(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	var buf strings.Builder
 
@@ -151,7 +151,7 @@ func ReadId(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
-func ReadInt(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadInt(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	var v int
 	base := 10
 	fpos := *pos
@@ -192,7 +192,7 @@ func ReadInt(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
-func ReadList(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadList(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	pos.column++
 	var body Forms
@@ -205,7 +205,7 @@ func ReadList(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
-func ReadPair(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadPair(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	pos.column++
 	left := out.PopBack()
@@ -223,7 +223,7 @@ func ReadPair(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
-func ReadSet(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadSet(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	pos.column++
 	var body Forms
@@ -236,7 +236,7 @@ func ReadSet(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
-func ReadStr(vm *VM, in *bufio.Reader, out *Forms, pos *Pos) error {
+func ReadStr(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	pos.column++
 	var buf strings.Builder

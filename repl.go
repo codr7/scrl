@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func REPL(vm *VM) {
+func REPL(vm *Vm) {
 	fmt.Printf("scrl v%v\n\n", VERSION)
 	in := bufio.NewScanner(os.Stdin)
 	out := os.Stdout
