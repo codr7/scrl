@@ -71,6 +71,16 @@ hello
 [3]
 ```
 
+### symbols
+New symbols may be created using `'...`.
+If the symbol already exists the same object is returned.
+
+```
+  = 'foo 'foo
+
+[T]
+```
+
 ### strings
 New strings may be created using `"..."`.
 

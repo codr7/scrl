@@ -1,12 +1,5 @@
-* replace Prim.arity with arg/ret_types
-* add syms
-** 'foo
-*** extract readId
-** add SymType
-** add Sym type
-** add vm.syms [string]*Sym
-** add Vm.Sym()
 * add EvalError/EmitError
+* replace Prim.arity with arg/ret_types
 * fib
 ** add fun macro
 * faster eval?

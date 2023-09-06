@@ -61,6 +61,8 @@ func ReadForm(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 		return ReadDeque(vm, in, out, pos)
 	case '{':
 		return ReadSet(vm, in, out, pos)
+	case '\'':
+		return ReadSym(vm, in, out, pos)
 	case '"':
 		return ReadStr(vm, in, out, pos)
 	case ':':
@@ -122,8 +124,7 @@ func ReadDeque(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
-func ReadId(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
-	fpos := *pos
+func readId(vm *Vm, in *bufio.Reader, pos *Pos) (string, error) {
 	var buf strings.Builder
 
 	for {
@@ -134,7 +135,7 @@ func ReadId(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 				break
 			}
 
-			return err
+			return "", err
 		}
 
 		if c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c == ']' ||
@@ -147,7 +148,18 @@ func ReadId(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 		pos.column++
 	}
 
-	out.PushBack(NewIdForm(fpos, buf.String()))
+	return buf.String(), nil
+}
+
+func ReadId(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
+	fpos := *pos
+	s, err := readId(vm, in, pos)
+
+	if err != nil {
+		return err
+	}
+
+	out.PushBack(NewIdForm(fpos, s))
 	return nil
 }
 
@@ -262,5 +274,18 @@ func ReadStr(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	}
 
 	out.PushBack(NewLitForm(fpos, NewVal(&AbcLib.StrType, buf.String())))
+	return nil
+}
+
+func ReadSym(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
+	fpos := *pos
+	pos.column++
+	name, err := readId(vm, in, pos)
+
+	if err != nil {
+		return err
+	}
+
+	out.PushBack(NewLitForm(fpos, NewVal(&AbcLib.SymType, vm.Sym(name))))
 	return nil
 }

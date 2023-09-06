@@ -25,6 +25,7 @@ type AbcLibT struct {
 	PrimType  PrimType
 	SetType   SetType
 	StrType   StrType
+	SymType   SymType
 	TimeType  TimeType
 }
 
@@ -40,6 +41,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BindType(&self.PrimType, "Prim")
 	self.BindType(&self.SetType, "Set")
 	self.BindType(&self.StrType, "Str")
+	self.BindType(&self.SymType, "Sym")
 	self.BindType(&self.TimeType, "Time")
 
 	self.Bind("T", NewVal(&self.BoolType, true))
@@ -343,6 +345,19 @@ type SetType struct {
 
 func (_ SetType) IsTrue(v Val) bool {
 	return v.d.(*ValSet).Len() > 0
+}
+
+type SymType struct {
+	BasicType
+}
+
+func (_ SymType) Compare(l, r Val) int {
+	return strings.Compare(l.d.(*Sym).name, r.d.(*Sym).name)
+}
+
+func (_ SymType) Dump(v Val, out io.Writer) error {
+	_, err := fmt.Fprintf(out, "'%v", v.d.(*Sym).name)
+	return err
 }
 
 type TimeType struct {
