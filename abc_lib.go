@@ -130,76 +130,76 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindPrim("=", 2,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			r := vm.Stack.PopBack()
-			l := vm.Stack.PopBack()
-			vm.Stack.PushBack(NewVal(&self.BoolType, l.Eq(r)))
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			r := stack.PopBack()
+			l := stack.PopBack()
+			stack.PushBack(NewVal(&self.BoolType, l.Eq(r)))
 			return pc, nil
 		})
 
 	self.BindPrim("<", 2,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			r := vm.Stack.PopBack()
-			l := vm.Stack.PopBack()
-			vm.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == -1))
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			r := stack.PopBack()
+			l := stack.PopBack()
+			stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == -1))
 			return pc, nil
 		})
 
 	self.BindPrim(">", 2,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			r := vm.Stack.PopBack()
-			l := vm.Stack.PopBack()
-			vm.Stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == 1))
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			r := stack.PopBack()
+			l := stack.PopBack()
+			stack.PushBack(NewVal(&self.BoolType, l.Compare(r) == 1))
 			return pc, nil
 		})
 
 	self.BindPrim("+", 2,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			r := vm.Stack.PopBack()
-			l := vm.Stack.PopBack()
-			vm.Stack.PushBack(NewVal(&self.IntType, l.d.(int)+r.d.(int)))
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			r := stack.PopBack()
+			l := stack.PopBack()
+			stack.PushBack(NewVal(&self.IntType, l.d.(int)+r.d.(int)))
 			return pc, nil
 		})
 
 	self.BindPrim("-", 2,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			r := vm.Stack.PopBack()
-			l := vm.Stack.PopBack()
-			vm.Stack.PushBack(NewVal(&self.IntType, l.d.(int)-r.d.(int)))
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			r := stack.PopBack()
+			l := stack.PopBack()
+			stack.PushBack(NewVal(&self.IntType, l.d.(int)-r.d.(int)))
 			return pc, nil
 		})
 
 	self.BindPrim("milliseconds", 1,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			n := vm.Stack.PopBack().d.(int)
-			vm.Stack.PushBack(NewVal(&self.TimeType, time.Duration(n)*time.Millisecond))
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			n := stack.PopBack().d.(int)
+			stack.PushBack(NewVal(&self.TimeType, time.Duration(n)*time.Millisecond))
 			return pc, nil
 		})
 
 	self.BindPrim("say", 1,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			vm.Stack.PopBack().Write(os.Stdout)
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			stack.PopBack().Write(os.Stdout)
 			io.WriteString(os.Stdout, "\n")
 			return pc, nil
 		})
 
 	self.BindPrim("sleep", 1,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			time.Sleep(vm.Stack.PopBack().d.(time.Duration))
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			time.Sleep(stack.PopBack().d.(time.Duration))
 			return pc, nil
 		})
 
 	self.BindPrim("trace", 0,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			vm.Trace = !vm.Trace
-			vm.Stack.PushBack(NewVal(&self.BoolType, vm.Trace))
+			stack.PushBack(NewVal(&self.BoolType, vm.Trace))
 			return pc, nil
 		})
 
 	self.BindPrim("type-of", 1,
-		func(_ *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error) {
-			v := vm.Stack.PopBack()
-			vm.Stack.PushBack(NewVal(&self.MetaType, v.t))
+		func(_ *Prim, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			v := stack.PopBack()
+			stack.PushBack(NewVal(&self.MetaType, v.t))
 			return pc, nil
 		})
 

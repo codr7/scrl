@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func REPL(vm *Vm) {
+func REPL(vm *Vm, env Env, stack *Stack) {
 	fmt.Printf("scrl v%v\n\n", VERSION)
 	in := bufio.NewScanner(os.Stdin)
 	out := os.Stdout
@@ -43,20 +43,19 @@ func REPL(vm *Vm) {
 
 			buf.Reset()
 
-			if err := forms.Emit(vm, &vm.Env); err != nil {
+			if err := forms.Emit(vm, env); err != nil {
 				fmt.Println(err)
 				goto NEXT
 			}
 
 			vm.Emit(&StopOp, true)
 
-			if _, err := vm.Eval(pc); err != nil {
+			if _, err := vm.Eval(pc, stack); err != nil {
 				fmt.Println(err)
-				vm.Stack.Clear()
 				goto NEXT
 			}
 		NEXT:
-			if err := vm.Stack.Dump(out); err != nil {
+			if err := stack.Dump(out); err != nil {
 				log.Fatal(err)
 			}
 

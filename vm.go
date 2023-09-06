@@ -7,21 +7,16 @@ const (
 )
 
 type Pc = int
-type Stack = Deque[Val]
 type Syms = map[string]*Sym
 
 type Vm struct {
 	Trace bool
-	Stack Stack
-	Env   BasicEnv
 
 	syms Syms
 	ops  []Op
 }
 
 func (self *Vm) Init() *Vm {
-	self.Stack.Init(nil)
-	self.Env.Init(nil)
 	self.syms = make(Syms)
 	return self
 }
@@ -40,8 +35,8 @@ func (self *Vm) Emit(op Op, trace bool) Pc {
 	return pc
 }
 
-func (self *Vm) Eval(pc Pc) (Pc, error) {
-	return self.ops[pc].Eval(self, pc)
+func (self *Vm) Eval(pc Pc, stack *Stack) (Pc, error) {
+	return self.ops[pc].Eval(self, stack, pc)
 }
 
 func (self *Vm) Sym(name string) *Sym {

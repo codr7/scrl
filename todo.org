@@ -1,9 +1,15 @@
+* generalize quoting
+** read form
+** add Expr type
+*** add Form.Eq()
+* rename Prim to Fun
+** rename PrimCall to Call
+** replace Prim.arity with arg/ret_types
 * add EvalError/EmitError
-* replace Prim.arity with arg/ret_types
 * fib
 ** add fun macro
 * faster eval?
-* add char literals
+* add echar literals
 ** add reader @A @b \n (@13) \t (@9) \s (@32)
 * add Timestamp type (time.Time)
 * track stack effects when emitting ops

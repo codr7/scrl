@@ -18,6 +18,10 @@ type BasicEnv struct {
 	bindings map[string]Val
 }
 
+func NewEnv(parent Env) *BasicEnv {
+	return new(BasicEnv).Init(parent)
+}
+
 func (self *BasicEnv) Init(parent Env) *BasicEnv {
 	self.parent = parent
 	self.bindings = make(map[string]Val)
