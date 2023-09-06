@@ -16,17 +16,18 @@ func init() {
 
 type AbcLibT struct {
 	BasicLib
-	BoolType  BoolType
-	DequeType DequeType
-	IntType   IntType
-	MacroType MacroType
-	MetaType  BasicType
-	PairType  PairType
-	FunType   FunType
-	SetType   SetType
-	StrType   StrType
-	SymType   SymType
-	TimeType  TimeType
+	BoolType   BoolType
+	DequeType  DequeType
+	IntType    IntType
+	MacroType  MacroType
+	MetaType   BasicType
+	PairType   PairType
+	FunType    FunType
+	FunArgType FunArgType
+	SetType    SetType
+	StrType    StrType
+	SymType    SymType
+	TimeType   TimeType
 }
 
 func (self *AbcLibT) Init(name string) *AbcLibT {
@@ -39,6 +40,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BindType(&self.MetaType, "Meta")
 	self.BindType(&self.PairType, "Pair")
 	self.BindType(&self.FunType, "Fun")
+	self.BindType(&self.FunArgType, "FunArg")
 	self.BindType(&self.SetType, "Set")
 	self.BindType(&self.StrType, "Str")
 	self.BindType(&self.SymType, "Sym")
@@ -83,10 +85,13 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
 			name := args.PopFront().(*IdForm).name
 			var funArgs FunArgs
+			bodyEnv := NewEnv(env)
 			arity := 0
 
 			for _, f := range args.PopFront().(*ListForm).items {
-				funArgs.Add(f.(*IdForm).name, nil)
+				name := f.(*IdForm).name
+				funArgs.Add(name, nil)
+				bodyEnv.Bind(name, NewVal(&self.FunArgType, arity))
 				arity++
 			}
 
@@ -101,7 +106,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 
 			env.Bind(name, NewVal(&self.FunType, fun))
 
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+			if err := args.PopFront().Emit(args, vm, bodyEnv); err != nil {
 				return err
 			}
 
@@ -351,6 +356,15 @@ func (_ FunType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
 	}
 
 	vm.Emit(NewCallOp(pos, f), true)
+	return nil
+}
+
+type FunArgType struct {
+	BasicType
+}
+
+func (_ FunArgType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
+	vm.Emit(NewFunArgOp(pos, v.d.(int)), true)
 	return nil
 }
 

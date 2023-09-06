@@ -120,6 +120,28 @@ func (self DequeOp) Dump(out io.Writer) error {
 	return nil
 }
 
+type FunArgOp struct {
+	pos   Pos
+	index int
+}
+
+func NewFunArgOp(pos Pos, index int) *FunArgOp {
+	return &FunArgOp{pos: pos, index: index}
+}
+
+func (self FunArgOp) Eval(vm *Vm, stack *Stack, pc Pc) (Pc, error) {
+	stack.PushBack(vm.calls.PeekBack().args[self.index])
+	return vm.Eval(pc+1, stack)
+}
+
+func (self FunArgOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "FunArg %v %v", self.pos, self.index); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type GotoOp struct {
 	pos Pos
 	pc  Pc

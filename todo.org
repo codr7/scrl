@@ -1,5 +1,5 @@
 * fib
-** fix fun arg lookup
+** debug fib/fun
 ** bench
 * generalize quoting
 ** read form
