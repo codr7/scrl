@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 )
 
 type Op interface {
@@ -37,6 +38,36 @@ func (self *AndOp) Dump(out io.Writer) error {
 	}
 
 	return nil
+}
+
+var BenchOp BenchOpT
+
+type BenchOpT struct{}
+
+func (self *BenchOpT) Eval(vm *VM, pc PC) (PC, error) {
+	reps := vm.Stack.PopBack().d.(int)
+	startTime := time.Now()
+
+	pc++
+	startPC := pc
+
+	for i := 0; i < reps; i++ {
+		var err error
+
+		if pc, err = vm.Eval(startPC); err != nil {
+			return pc, err
+		}
+
+		vm.Stack.Clear()
+	}
+
+	vm.Stack.PushBack(NewVal(&AbcLib.TimeType, time.Now().Sub(startTime)))
+	return pc, nil
+}
+
+func (self *BenchOpT) Dump(out io.Writer) error {
+	_, err := io.WriteString(out, "Bench")
+	return err
 }
 
 type DequeOp struct {

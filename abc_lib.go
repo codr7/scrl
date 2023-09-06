@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
 var AbcLib AbcLibT
@@ -24,6 +25,7 @@ type AbcLibT struct {
 	PrimType  PrimType
 	SetType   SetType
 	StrType   StrType
+	TimeType  TimeType
 }
 
 func (self *AbcLibT) Init(name string) *AbcLibT {
@@ -38,6 +40,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.BindType(&self.PrimType, "Prim")
 	self.BindType(&self.SetType, "Set")
 	self.BindType(&self.StrType, "Str")
+	self.BindType(&self.TimeType, "Time")
 
 	self.Bind("T", NewVal(&self.BoolType, true))
 	self.Bind("F", NewVal(&self.BoolType, false))
@@ -55,6 +58,22 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			}
 
 			vm.Ops[andPC] = NewAndOp(pos, vm.EmitPC())
+			return nil
+		})
+
+	self.BindMacro("bench",
+		func(_ *Macro, args *Forms, vm *VM, env Env, pos Pos) error {
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			vm.Ops[vm.Emit(true)] = &BenchOp
+
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			vm.Ops[vm.Emit(true)] = &StopOp
 			return nil
 		})
 
@@ -148,10 +167,23 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
+	self.BindPrim("milliseconds", 1,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			n := vm.Stack.PopBack().d.(int)
+			vm.Stack.PushBack(NewVal(&self.TimeType, time.Duration(n)*time.Millisecond))
+			return pc, nil
+		})
+
 	self.BindPrim("say", 1,
 		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
 			vm.Stack.PopBack().Write(os.Stdout)
 			io.WriteString(os.Stdout, "\n")
+			return pc, nil
+		})
+
+	self.BindPrim("sleep", 1,
+		func(_ *Prim, vm *VM, pos Pos, pc PC) (PC, error) {
+			time.Sleep(vm.Stack.PopBack().d.(time.Duration))
 			return pc, nil
 		})
 
@@ -311,4 +343,16 @@ type SetType struct {
 
 func (_ SetType) IsTrue(v Val) bool {
 	return v.d.(*ValSet).Len() > 0
+}
+
+type TimeType struct {
+	BasicType
+}
+
+func (_ TimeType) Compare(l, r Val) int {
+	return l.d.(time.Time).Compare(r.d.(time.Time))
+}
+
+func (_ TimeType) IsTrue(v Val) bool {
+	return !v.d.(time.Time).IsZero()
 }

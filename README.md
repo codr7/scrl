@@ -141,3 +141,12 @@ New sets may be created using `{...}`.
 9 Stop
 [T 1 2 3]
 ```
+
+## benchmarking
+`bench` may be used to measure elapsed time for specified number of repetitions.
+
+```
+  bench 2 sleep milliseconds 500
+  
+[1.001917973s]
+```

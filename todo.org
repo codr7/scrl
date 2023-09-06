@@ -1,7 +1,39 @@
+* PC, VM
+* Ops -> ops
+** add Op arg to Emit
+* replace Prim.arity with arg/ret_types
+* add syms
+** 'foo
+*** extract readId
+** add SymType
+** add Sym type
+** add vm.syms [string]*Sym
+** add Vm.Sym()
+* add EvalError/EmitError
 * fib
-** add bench op
+** add fun macro
 * faster eval?
 * add char literals
 ** add reader @A @b \n (@13) \t (@9) \s (@32)
+* add Timestamp type (time.Time)
+* track stack effects when emitting ops
+** add stacks []Stack argument to emit
+*** update all
+*** nil value == undefined
+*** add Undefined type
 
-s2, e12
+s3, e8
+
+ fun fib (n) 
+   if < n 2 n else + fib dec n fib - n 2
+
+ bench 100 fib 20
+
+[712]
+
+ fun fib(n a b)
+   if > n 1 ret fib dec n b + a b else if z? n a else b
+
+ bench 10000 fib 70 0 1
+
+[268]
