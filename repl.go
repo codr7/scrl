@@ -32,7 +32,7 @@ func REPL(vm *Vm) {
 
 		if line == "" {
 			pos := NewPos("repl", 1, 1)
-			pc := vm.EmitPC()
+			pc := vm.EmitPc()
 			var forms Forms
 
 			if err := ReadForms(vm, bufio.NewReader(&buf), &forms, &pos); err != nil {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type PrimBody = func(self *Prim, vm *Vm, pos Pos, pc PC) (PC, error)
+type PrimBody = func(self *Prim, vm *Vm, pos Pos, pc Pc) (Pc, error)
 
 type Prim struct {
 	name  string
@@ -23,7 +23,7 @@ func (self *Prim) Init(name string, arity int, body PrimBody) *Prim {
 	return self
 }
 
-func (self *Prim) Call(vm *Vm, pos Pos, pc PC) (PC, error) {
+func (self *Prim) Call(vm *Vm, pos Pos, pc Pc) (Pc, error) {
 	return self.body(self, vm, pos, pc)
 }
 
