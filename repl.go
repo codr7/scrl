@@ -49,9 +49,8 @@ func REPL(vm *Vm, env Env, stack *Stack) {
 			}
 
 			vm.Emit(&StopOp, true)
-			vm.Compile(pc)
 
-			if _, err := vm.Eval(pc, stack); err != nil {
+			if _, err := Eval(vm, stack, pc); err != nil {
 				fmt.Println(err)
 				goto NEXT
 			}

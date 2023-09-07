@@ -8,14 +8,12 @@ const (
 
 type Pc = int
 type Syms = map[string]*Sym
-type Bin = func(vm *Vm, stack *Stack, pc Pc) (Pc, error)
 
 type Vm struct {
 	Trace bool
 
 	syms  Syms
 	ops   []Op
-	bins  []Bin
 	calls Deque[Call]
 }
 
@@ -36,24 +34,6 @@ func (self *Vm) Emit(op Op, trace bool) Pc {
 	pc := self.EmitPc()
 	self.ops = append(self.ops, op)
 	return pc
-}
-
-func (self *Vm) Eval(pc Pc, stack *Stack) (Pc, error) {
-	return self.bins[pc](self, stack, pc)
-}
-
-func (self *Vm) Compile(pc Pc) {
-	var buf []Bin
-	var next Bin
-
-	for i := len(self.ops) - 1; i >= pc; i-- {
-		next = self.ops[i].Compile(next)
-		buf = append(buf, next)
-	}
-
-	for i := len(buf) - 1; i >= 0; i-- {
-		self.bins = append(self.bins, buf[i])
-	}
 }
 
 func (self *Vm) Sym(name string) *Sym {

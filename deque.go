@@ -33,8 +33,8 @@ func (self Deque[T]) PeekFront() T {
 	return self.items[0]
 }
 
-func (self Deque[T]) PeekBack() T {
-	return self.items[len(self.items)-1]
+func (self Deque[T]) PeekBack() *T {
+	return &self.items[len(self.items)-1]
 }
 
 func (self *Deque[T]) PopFront() T {

@@ -366,11 +366,11 @@ func (_ FunType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos, ret bool) er
 		}
 	}
 
-	if fun.pc != -1 && ret {
-		vm.Emit(NewTailCallOp(pos, fun), true)
-	} else {
-		vm.Emit(NewCallOp(pos, fun), true)
-	}
+	//if fun.pc != -1 && ret {
+	//	vm.Emit(NewTailCallOp(pos, fun), true)
+	//} else {
+	vm.Emit(NewCallOp(pos, fun), true)
+	//}
 
 	return nil
 }
