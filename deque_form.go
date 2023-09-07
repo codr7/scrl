@@ -17,8 +17,8 @@ func (self *DequeForm) Init(pos Pos, items ...Form) *DequeForm {
 	return self
 }
 
-func (self *DequeForm) Emit(args *Forms, vm *Vm, env Env) error {
-	if err := self.ItemsForm.Emit(args, vm, env); err != nil {
+func (self *DequeForm) Emit(args *Forms, vm *Vm, env Env, ret bool) error {
+	if err := self.ItemsForm.Emit(args, vm, env, false); err != nil {
 		return err
 	}
 

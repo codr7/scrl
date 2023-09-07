@@ -1,3 +1,9 @@
+* add Bin
+** add vm.bins
+** add vm.Compile
+*** start from bottom and pass to prev
+* convert vm.Eval to freestanding func
+* cache trailing args in call ops
 * generalize quoting
 ** read form
 ** add Expr type
@@ -20,6 +26,8 @@ s3, e11
  bench 100 fib 20
 
 [712]
+[847.756381ms]
+[809.863304ms]
 
  fun fib(n a b)
    if > n 1 ret fib - n 1 b + a b else if = n 0 a else b
@@ -27,3 +35,5 @@ s3, e11
  bench 10000 fib 70 0 1
 
 [268]
+[216.274393ms]
+

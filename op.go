@@ -308,6 +308,31 @@ func (_ StopOpT) Dump(out io.Writer) error {
 	return err
 }
 
+type TailCallOp struct {
+	pos    Pos
+	target *Fun
+}
+
+func NewTailCallOp(pos Pos, target *Fun) *TailCallOp {
+	return &TailCallOp{pos: pos, target: target}
+}
+
+func (self TailCallOp) Eval(vm *Vm, stack *Stack, pc Pc) (Pc, error) {
+	c := vm.calls.PeekBack()
+	c.pos = self.pos
+	c.target = self.target
+	c.args = stack.Cut(self.target.Arity())
+	return vm.Eval(self.target.pc, stack)
+}
+
+func (self TailCallOp) Dump(out io.Writer) error {
+	if _, err := fmt.Fprintf(out, "TailCall %v %v", self.pos, self.target); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 var TraceOp TraceOpT
 
 type TraceOpT struct{}

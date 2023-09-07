@@ -10,6 +10,7 @@ type Fun struct {
 	name string
 	args FunArgs
 	body FunBody
+	pc   Pc
 }
 
 func NewFun(name string, args FunArgs, body FunBody) *Fun {
@@ -20,6 +21,7 @@ func (self *Fun) Init(name string, args FunArgs, body FunBody) *Fun {
 	self.name = name
 	self.args = args
 	self.body = body
+	self.pc = -1
 	return self
 }
 

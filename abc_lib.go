@@ -50,14 +50,14 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 	self.Bind("F", NewVal(&self.BoolType, false))
 
 	self.BindMacro("and",
-		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
+			if err := args.PopFront().Emit(args, vm, env, ret); err != nil {
 				return err
 			}
 
 			andPc := vm.Emit(nil, true)
 
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+			if err := args.PopFront().Emit(args, vm, env, false); err != nil {
 				return err
 			}
 
@@ -66,14 +66,14 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindMacro("bench",
-		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
+			if err := args.PopFront().Emit(args, vm, env, ret); err != nil {
 				return err
 			}
 
 			vm.Emit(&BenchOp, true)
 
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+			if err := args.PopFront().Emit(args, vm, env, false); err != nil {
 				return err
 			}
 
@@ -82,7 +82,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindMacro("fun",
-		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
 			name := args.PopFront().(*IdForm).name
 			var funArgs FunArgs
 			bodyEnv := NewEnv(env)
@@ -104,9 +104,10 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 					return startPc, nil
 				})
 
+			fun.pc = startPc
 			env.Bind(name, NewVal(&self.FunType, fun))
 
-			if err := args.PopFront().Emit(args, vm, bodyEnv); err != nil {
+			if err := args.PopFront().Emit(args, vm, bodyEnv, false); err != nil {
 				return err
 			}
 
@@ -116,14 +117,14 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindMacro("if",
-		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
+			if err := args.PopFront().Emit(args, vm, env, ret); err != nil {
 				return err
 			}
 
 			ifPc := vm.Emit(nil, true)
 
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+			if err := args.PopFront().Emit(args, vm, env, false); err != nil {
 				return err
 			}
 
@@ -137,7 +138,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 					gotoPc := vm.Emit(nil, true)
 					elsePc = vm.EmitPc()
 
-					if err := args.PopFront().Emit(args, vm, env); err != nil {
+					if err := args.PopFront().Emit(args, vm, env, false); err != nil {
 						return err
 					}
 
@@ -150,14 +151,14 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindMacro("or",
-		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
+			if err := args.PopFront().Emit(args, vm, env, ret); err != nil {
 				return err
 			}
 
 			orPc := vm.Emit(nil, true)
 
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+			if err := args.PopFront().Emit(args, vm, env, false); err != nil {
 				return err
 			}
 
@@ -166,8 +167,8 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 		})
 
 	self.BindMacro("ret",
-		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
-			if err := args.PopFront().Emit(args, vm, env); err != nil {
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
+			if err := args.PopFront().Emit(args, vm, env, true); err != nil {
 				return err
 			}
 
@@ -317,8 +318,8 @@ type MacroType struct {
 	BasicType
 }
 
-func (_ MacroType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
-	return v.d.(*Macro).Emit(args, vm, env, pos)
+func (_ MacroType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
+	return v.d.(*Macro).Emit(args, vm, env, pos, ret)
 }
 
 type PairType struct {
@@ -356,16 +357,21 @@ type FunType struct {
 	BasicType
 }
 
-func (_ FunType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
-	f := v.d.(*Fun)
+func (_ FunType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
+	fun := v.d.(*Fun)
 
-	for i := 0; i < f.Arity(); i++ {
-		if err := args.PopFront().Emit(args, vm, env); err != nil {
+	for i := 0; i < fun.Arity(); i++ {
+		if err := args.PopFront().Emit(args, vm, env, false); err != nil {
 			return err
 		}
 	}
 
-	vm.Emit(NewCallOp(pos, f), true)
+	if fun.pc != -1 && ret {
+		vm.Emit(NewTailCallOp(pos, fun), true)
+	} else {
+		vm.Emit(NewCallOp(pos, fun), true)
+	}
+
 	return nil
 }
 
@@ -373,7 +379,7 @@ type FunArgType struct {
 	BasicType
 }
 
-func (_ FunArgType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos) error {
+func (_ FunArgType) Emit(v Val, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
 	vm.Emit(NewFunArgOp(pos, v.d.(int)), true)
 	return nil
 }
