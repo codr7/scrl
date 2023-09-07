@@ -165,6 +165,16 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return nil
 		})
 
+	self.BindMacro("ret",
+		func(_ *Macro, args *Forms, vm *Vm, env Env, pos Pos) error {
+			if err := args.PopFront().Emit(args, vm, env); err != nil {
+				return err
+			}
+
+			vm.Emit(&RetOp, true)
+			return nil
+		})
+
 	self.BindFun("=", *new(FunArgs).Add("x", nil).Add("y", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()

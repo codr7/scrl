@@ -264,7 +264,7 @@ var RetOp RetOpT
 type RetOpT struct{}
 
 func (_ RetOpT) Eval(vm *Vm, stack *Stack, pc Pc) (Pc, error) {
-	return vm.calls.PopBack().retPc, nil
+	return vm.Eval(vm.calls.PopBack().retPc, stack)
 }
 
 func (_ RetOpT) Dump(out io.Writer) error {
