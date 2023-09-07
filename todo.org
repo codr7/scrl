@@ -1,9 +1,7 @@
-* cache trailing args in call ops
 * generalize quoting
 ** read form
 ** add Expr type
 *** add Form.Eq()
-* faster eval?
 * add echar literals
 ** add reader @A @b \n (@13) \t (@9) \s (@32)
 * add Timestamp type (time.Time)
