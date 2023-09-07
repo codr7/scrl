@@ -39,24 +39,21 @@ func (self *Vm) Emit(op Op, trace bool) Pc {
 }
 
 func (self *Vm) Eval(pc Pc, stack *Stack) (Pc, error) {
-	return self.ops[pc].Eval(self, stack, pc)
+	return self.bins[pc](self, stack, pc)
 }
 
-func (self *Vm) Compile(pc Pc) error {
+func (self *Vm) Compile(pc Pc) {
+	var buf []Bin
 	var next Bin
-	var err error
 
-	for i := len(self.ops) - 1; i >= pc; pc-- {
-		next, err = self.ops[i].Compile(next)
-
-		if err != nil {
-			return err
-		}
-
-		self.ops[i] = next
+	for i := len(self.ops) - 1; i >= pc; i-- {
+		next = self.ops[i].Compile(next)
+		buf = append(buf, next)
 	}
 
-	return nil
+	for i := len(buf) - 1; i >= 0; i-- {
+		self.bins = append(self.bins, buf[i])
+	}
 }
 
 func (self *Vm) Sym(name string) *Sym {
