@@ -1,3 +1,4 @@
+* add Fun ret_types
 * generalize quoting
 ** read form
 ** add Expr type
@@ -12,24 +13,3 @@
 *** add Undefined type
 
 s3, e11
-
- fun fib (n) 
-   if < n 2 n else + fib - n 1 fib - n 2
-
- bench 100 fib 20
-
-[712]
-[847.756381ms]
-[809.863304ms]
-[591.254838ms]
-[180.872334ms]
-
- fun fib(n a b)
-   if > n 1 fib - n 1 b + a b else if = n 0 a else b
-
- bench 10000 fib 70 0 1
-
-[268]
-[216.274393ms]
-[180.84546ms]
-[95.625802ms]

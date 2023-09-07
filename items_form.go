@@ -15,10 +15,10 @@ func (self *ItemsForm) Init(pos Pos, items []Form) *ItemsForm {
 	return self
 }
 
-func (self ItemsForm) Emit(args *Forms, vm *Vm, env Env, ret bool) error {
-	var fargs Forms
-	fargs.Init(self.items)
-	return fargs.Emit(vm, env)
+func (self ItemsForm) Emit(args *Forms, vm *Vm, env Env) error {
+	var fs Forms
+	fs.Init(self.items)
+	return fs.Emit(vm, env)
 }
 
 func (self ItemsForm) Dump(out io.Writer) error {

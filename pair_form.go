@@ -20,12 +20,12 @@ func (self *PairForm) Init(pos Pos, left, right Form) *PairForm {
 	return self
 }
 
-func (self PairForm) Emit(args *Forms, vm *Vm, env Env, ret bool) error {
-	if err := self.left.Emit(args, vm, env, ret); err != nil {
+func (self PairForm) Emit(args *Forms, vm *Vm, env Env) error {
+	if err := self.left.Emit(args, vm, env); err != nil {
 		return err
 	}
 
-	if err := self.right.Emit(args, vm, env, false); err != nil {
+	if err := self.right.Emit(args, vm, env); err != nil {
 		return err
 	}
 

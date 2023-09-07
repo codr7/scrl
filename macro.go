@@ -2,7 +2,7 @@ package scrl
 
 import ()
 
-type MacroBody = func(self *Macro, args *Forms, vm *Vm, env Env, pos Pos, ret bool) error
+type MacroBody = func(self *Macro, args *Forms, vm *Vm, env Env, pos Pos) error
 
 type Macro struct {
 	name string
@@ -19,8 +19,8 @@ func (self *Macro) Init(name string, body MacroBody) *Macro {
 	return self
 }
 
-func (self *Macro) Emit(args *Forms, vm *Vm, env Env, pos Pos, ret bool) error {
-	return self.body(self, args, vm, env, pos, ret)
+func (self *Macro) Emit(args *Forms, vm *Vm, env Env, pos Pos) error {
+	return self.body(self, args, vm, env, pos)
 }
 
 func (self *Macro) String() string {

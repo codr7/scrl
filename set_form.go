@@ -17,8 +17,8 @@ func (self *SetForm) Init(pos Pos, items ...Form) *SetForm {
 	return self
 }
 
-func (self *SetForm) Emit(args *Forms, vm *Vm, env Env, ret bool) error {
-	if err := self.ItemsForm.Emit(args, vm, env, false); err != nil {
+func (self *SetForm) Emit(args *Forms, vm *Vm, env Env) error {
+	if err := self.ItemsForm.Emit(args, vm, env); err != nil {
 		return err
 	}
 

@@ -19,14 +19,14 @@ func (self *IdForm) Init(pos Pos, name string) *IdForm {
 	return self
 }
 
-func (self *IdForm) Emit(args *Forms, vm *Vm, env Env, ret bool) error {
+func (self *IdForm) Emit(args *Forms, vm *Vm, env Env) error {
 	found := env.Find(self.name)
 
 	if found == nil {
 		return NewError(self.pos, "Unknown identifier: %v", self.name)
 	}
 
-	if err := found.Emit(args, vm, env, self.pos, ret); err != nil {
+	if err := found.Emit(args, vm, env, self.pos); err != nil {
 		return err
 	}
 
