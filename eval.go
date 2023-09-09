@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-func Eval(vm *Vm, stack *Stack, pc Pc) (Pc, error) {
+func (self *Vm) Eval(stack *Stack, pc Pc) (Pc, error) {
 NEXT:
-	switch op := vm.ops[pc].(type) {
+	switch op := self.ops[pc].(type) {
 	case *AndOp:
 		v := stack.PeekBack()
 
@@ -31,7 +31,7 @@ NEXT:
 		for i := 0; i < reps; i++ {
 			var err error
 
-			if pc, err = Eval(vm, stack, startPc); err != nil {
+			if pc, err = self.Eval(stack, startPc); err != nil {
 				return pc, err
 			}
 
@@ -42,7 +42,7 @@ NEXT:
 		goto NEXT
 	case *CallOp:
 		var err error
-		pc, err = op.target.Call(vm, stack, op.pos, pc+1)
+		pc, err = op.target.Call(self, stack, op.pos, pc+1)
 
 		if err != nil {
 			return pc, err
@@ -55,7 +55,7 @@ NEXT:
 		pc++
 		goto NEXT
 	case *FunArgOp:
-		stack.PushBack(vm.calls.PeekBack().args[op.index])
+		stack.PushBack(self.calls.PeekBack().args[op.index])
 		pc++
 		goto NEXT
 	case *GotoOp:
@@ -93,7 +93,7 @@ NEXT:
 		pc++
 		goto NEXT
 	case *RetOpT:
-		pc = vm.calls.PopBack().retPc
+		pc = self.calls.PopBack().retPc
 		goto NEXT
 	case *SetOp:
 		s := NewValSet(stack.Cut(op.itemCount))
@@ -105,7 +105,7 @@ NEXT:
 	case *TraceOpT:
 		pc++
 		fmt.Fprintf(os.Stdout, "%v ", pc)
-		vm.ops[pc].Dump(os.Stdout)
+		self.ops[pc].Dump(os.Stdout)
 		io.WriteString(os.Stdout, "\n")
 		goto NEXT
 	default:
