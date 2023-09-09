@@ -30,7 +30,9 @@ func REPL(vm *Vm, env Env, stack *Stack) {
 
 		line := in.Text()
 
-		if line == "" {
+		if buf.Len() == 0 && line == "quit" {
+			return
+		} else if line == "" {
 			pos := NewPos("repl", 1, 1)
 			pc := vm.EmitPc()
 			var forms Forms

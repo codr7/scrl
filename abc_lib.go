@@ -216,6 +216,12 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
+	self.BindFun("exit", *new(FunArgs).Add("v", nil),
+		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
+			os.Exit(stack.PopBack().d.(int))
+			return pc, nil
+		})
+
 	self.BindFun("milliseconds", *new(FunArgs).Add("v", nil),
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			n := stack.PopBack().d.(int)
