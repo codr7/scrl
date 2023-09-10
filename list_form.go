@@ -17,6 +17,15 @@ func (self *ListForm) Init(pos Pos, items ...Form) *ListForm {
 	return self
 }
 
+func (self ListForm) Eq(other Form) bool {
+	f, ok := other.(*ListForm)
+	return ok && self.EqItems(f.items)
+}
+
+func (self *ListForm) Quote(vm *Vm) Val {
+	return NewVal(&AbcLib.ExprType, self)
+}
+
 func (self ListForm) Dump(out io.Writer) error {
 	if _, err := io.WriteString(out, "("); err != nil {
 		return err

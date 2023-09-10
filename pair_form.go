@@ -33,6 +33,15 @@ func (self PairForm) Emit(args *Forms, vm *Vm, env Env) error {
 	return nil
 }
 
+func (self *PairForm) Quote(vm *Vm) Val {
+	return NewVal(&AbcLib.ExprType, self)
+}
+
+func (self PairForm) Eq(other Form) bool {
+	f, ok := other.(*PairForm)
+	return ok && self.left.Eq(f.left) && self.right.Eq(f.right)
+}
+
 func (self PairForm) Dump(out io.Writer) error {
 	if err := self.left.Dump(out); err != nil {
 		return err

@@ -19,6 +19,7 @@ type AbcLibT struct {
 	BoolType   BoolType
 	DequeType  DequeType
 	IntType    IntType
+	ExprType   ExprType
 	MacroType  MacroType
 	MetaType   BasicType
 	PairType   PairType
@@ -35,6 +36,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 
 	self.BindType(&self.BoolType, "Bool")
 	self.BindType(&self.DequeType, "Deque")
+	self.BindType(&self.ExprType, "Expr")
 	self.BindType(&self.IntType, "Int")
 	self.BindType(&self.MacroType, "Macro")
 	self.BindType(&self.MetaType, "Meta")
@@ -298,6 +300,22 @@ type DequeType struct {
 
 func (_ DequeType) IsTrue(v Val) bool {
 	return v.d.(*ValDeque).Len() > 0
+}
+
+type ExprType struct {
+	BasicType
+}
+
+func (_ ExprType) Eq(l, r Val) bool {
+	return l.d.(Form).Eq(r.d.(Form))
+}
+
+func (_ ExprType) Dump(v Val, out io.Writer) error {
+	if _, err := io.WriteString(out, "'"); err != nil {
+		return err
+	}
+
+	return v.d.(Form).Dump(out)
 }
 
 type IntType struct {

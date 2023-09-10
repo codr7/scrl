@@ -26,6 +26,15 @@ func (self *DequeForm) Emit(args *Forms, vm *Vm, env Env) error {
 	return nil
 }
 
+func (self *DequeForm) Quote(vm *Vm) Val {
+	return NewVal(&AbcLib.ExprType, self)
+}
+
+func (self DequeForm) Eq(other Form) bool {
+	f, ok := other.(*DequeForm)
+	return ok && self.EqItems(f.items)
+}
+
 func (self DequeForm) Dump(out io.Writer) error {
 	if _, err := io.WriteString(out, "["); err != nil {
 		return err

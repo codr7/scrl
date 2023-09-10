@@ -26,6 +26,15 @@ func (self *SetForm) Emit(args *Forms, vm *Vm, env Env) error {
 	return nil
 }
 
+func (self *SetForm) Quote(vm *Vm) Val {
+	return NewVal(&AbcLib.ExprType, self)
+}
+
+func (self SetForm) Eq(other Form) bool {
+	f, ok := other.(*SetForm)
+	return ok && self.EqItems(f.items)
+}
+
 func (self SetForm) Dump(out io.Writer) error {
 	if _, err := io.WriteString(out, "{"); err != nil {
 		return err

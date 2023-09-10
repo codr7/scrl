@@ -24,6 +24,15 @@ func (self LitForm) Emit(args *Forms, vm *Vm, env Env) error {
 	return nil
 }
 
+func (self *LitForm) Quote(vm *Vm) Val {
+	return self.val
+}
+
+func (self LitForm) Eq(other Form) bool {
+	f, ok := other.(*LitForm)
+	return ok && f.val.Eq(self.val)
+}
+
 func (self LitForm) Dump(out io.Writer) error {
 	return self.val.Dump(out)
 }

@@ -7,6 +7,8 @@ import (
 type Form interface {
 	Pos() Pos
 	Emit(args *Forms, vm *Vm, env Env) error
+	Quote(vm *Vm) Val
+	Eq(other Form) bool
 	Dump(out io.Writer) error
 }
 

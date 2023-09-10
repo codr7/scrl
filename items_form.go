@@ -21,6 +21,22 @@ func (self ItemsForm) Emit(args *Forms, vm *Vm, env Env) error {
 	return fs.Emit(vm, env)
 }
 
+func (self ItemsForm) EqItems(other []Form) bool {
+	n := len(self.items)
+
+	if n != len(other) {
+		return false
+	}
+
+	for i, f := range self.items {
+		if !f.Eq(other[i]) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (self ItemsForm) Dump(out io.Writer) error {
 	for i, f := range self.items {
 		if i > 0 {

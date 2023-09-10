@@ -61,7 +61,7 @@ func ReadForm(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	case '{':
 		return ReadSet(vm, in, out, pos)
 	case '\'':
-		return ReadSym(vm, in, out, pos)
+		return ReadQuote(vm, in, out, pos)
 	case '"':
 		return ReadStr(vm, in, out, pos)
 	case ':':
@@ -234,6 +234,18 @@ func ReadPair(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	return nil
 }
 
+func ReadQuote(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
+	fpos := *pos
+	pos.column++
+
+	if err := ReadForm(vm, in, out, pos); err != nil {
+		return err
+	}
+
+	out.PushBack(NewLitForm(fpos, out.PopBack().Quote(vm)))
+	return nil
+}
+
 func ReadSet(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	fpos := *pos
 	pos.column++
@@ -273,18 +285,5 @@ func ReadStr(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
 	}
 
 	out.PushBack(NewLitForm(fpos, NewVal(&AbcLib.StrType, buf.String())))
-	return nil
-}
-
-func ReadSym(vm *Vm, in *bufio.Reader, out *Forms, pos *Pos) error {
-	fpos := *pos
-	pos.column++
-	name, err := readId(vm, in, pos)
-
-	if err != nil {
-		return err
-	}
-
-	out.PushBack(NewLitForm(fpos, NewVal(&AbcLib.SymType, vm.Sym(name))))
 	return nil
 }
