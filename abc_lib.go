@@ -98,7 +98,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			skipPc := vm.Emit(nil, true)
 			startPc := vm.EmitPc()
 
-			fun := NewFun(name, funArgs,
+			fun := NewFun(name, funArgs, nil,
 				func(fun *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 					vm.calls.PushBack(NewCall(pos, fun, stack.Cut(arity), pc))
 					return startPc, nil
@@ -176,7 +176,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return nil
 		})
 
-	self.BindFun("=", *new(FunArgs).Add("x", nil).Add("y", nil),
+	self.BindFun("=", *new(FunArgs).Add("x", nil).Add("y", nil), &self.BoolType,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -184,7 +184,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun("<", *new(FunArgs).Add("x", nil).Add("y", nil),
+	self.BindFun("<", *new(FunArgs).Add("x", nil).Add("y", nil), &self.BoolType,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -192,7 +192,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun(">", *new(FunArgs).Add("x", nil).Add("y", nil),
+	self.BindFun(">", *new(FunArgs).Add("x", nil).Add("y", nil), &self.BoolType,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -200,7 +200,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun("+", *new(FunArgs).Add("x", nil).Add("y", nil),
+	self.BindFun("+", *new(FunArgs).Add("x", nil).Add("y", nil), nil,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -208,7 +208,7 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun("-", *new(FunArgs).Add("x", nil).Add("y", nil),
+	self.BindFun("-", *new(FunArgs).Add("x", nil).Add("y", nil), nil,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			r := stack.PopBack()
 			l := stack.PopBack()
@@ -216,47 +216,47 @@ func (self *AbcLibT) Init(name string) *AbcLibT {
 			return pc, nil
 		})
 
-	self.BindFun("exit", *new(FunArgs).Add("v", nil),
+	self.BindFun("exit", *new(FunArgs).Add("v", nil), nil,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			os.Exit(stack.PopBack().d.(int))
 			return pc, nil
 		})
 
-	self.BindFun("milliseconds", *new(FunArgs).Add("v", nil),
+	self.BindFun("milliseconds", *new(FunArgs).Add("v", nil), &self.TimeType,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			n := stack.PopBack().d.(int)
 			stack.PushBack(NewVal(&self.TimeType, time.Duration(n)*time.Millisecond))
 			return pc, nil
 		})
 
-	self.BindFun("say", *new(FunArgs).Add("v", nil),
+	self.BindFun("say", *new(FunArgs).Add("v", nil), nil,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			stack.PopBack().Write(os.Stdout)
 			io.WriteString(os.Stdout, "\n")
 			return pc, nil
 		})
 
-	self.BindFun("sym", *new(FunArgs).Add("s", nil),
+	self.BindFun("sym", *new(FunArgs).Add("s", nil), &self.SymType,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			s := vm.Sym(stack.PopBack().d.(string))
 			stack.PushBack(NewVal(&self.SymType, s))
 			return pc, nil
 		})
 
-	self.BindFun("sleep", *new(FunArgs).Add("t", nil),
+	self.BindFun("sleep", *new(FunArgs).Add("t", nil), nil,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			time.Sleep(stack.PopBack().d.(time.Duration))
 			return pc, nil
 		})
 
-	self.BindFun("trace", *new(FunArgs),
+	self.BindFun("trace", *new(FunArgs), &self.BoolType,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			vm.Trace = !vm.Trace
 			stack.PushBack(NewVal(&self.BoolType, vm.Trace))
 			return pc, nil
 		})
 
-	self.BindFun("type-of", *new(FunArgs).Add("v", nil),
+	self.BindFun("type-of", *new(FunArgs).Add("v", nil), &self.MetaType,
 		func(_ *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error) {
 			v := stack.PopBack()
 			stack.PushBack(NewVal(&self.MetaType, v.t))

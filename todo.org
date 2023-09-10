@@ -1,4 +1,3 @@
-* add Fun ret_types
 * generalize quoting
 ** read form
 ** add Expr type
@@ -14,4 +13,4 @@
 
 go tool pprof
 
-s4, e2
+s4, e6

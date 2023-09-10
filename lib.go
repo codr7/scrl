@@ -24,8 +24,8 @@ func (self *BasicLib) BindMacro(name string, body MacroBody) {
 	self.Bind(name, NewVal(&AbcLib.MacroType, NewMacro(name, body)))
 }
 
-func (self *BasicLib) BindFun(name string, args FunArgs, body FunBody) {
-	self.Bind(name, NewVal(&AbcLib.FunType, NewFun(name, args, body)))
+func (self *BasicLib) BindFun(name string, args FunArgs, retType Type, body FunBody) {
+	self.Bind(name, NewVal(&AbcLib.FunType, NewFun(name, args, retType, body)))
 }
 
 func (self *BasicLib) BindType(t Type, name string) {

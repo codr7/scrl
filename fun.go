@@ -9,17 +9,19 @@ type FunBody = func(self *Fun, vm *Vm, stack *Stack, pos Pos, pc Pc) (Pc, error)
 type Fun struct {
 	name string
 	args FunArgs
+	ret  Type
 	body FunBody
 	pc   Pc
 }
 
-func NewFun(name string, args FunArgs, body FunBody) *Fun {
-	return new(Fun).Init(name, args, body)
+func NewFun(name string, args FunArgs, ret Type, body FunBody) *Fun {
+	return new(Fun).Init(name, args, ret, body)
 }
 
-func (self *Fun) Init(name string, args FunArgs, body FunBody) *Fun {
+func (self *Fun) Init(name string, args FunArgs, ret Type, body FunBody) *Fun {
 	self.name = name
 	self.args = args
+	self.ret = ret
 	self.body = body
 	self.pc = -1
 	return self
